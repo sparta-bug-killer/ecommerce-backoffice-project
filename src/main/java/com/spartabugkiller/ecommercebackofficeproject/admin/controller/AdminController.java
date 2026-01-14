@@ -25,8 +25,17 @@ public class AdminController {
     }
 
     @GetMapping("/{adminId}")
-    public ResponseEntity<AdminDetailResponse> getAdmin(@PathVariable Long adminId) {
-        AdminDetailResponse response = adminService.getAdmin(adminId);
+    public ResponseEntity<GetAdminDetailResponse> getAdmin(@PathVariable Long adminId) {
+        GetAdminDetailResponse response = adminService.getAdmin(adminId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{adminId}")
+    public ResponseEntity<UpdateAdminResponse> updateAdmin(
+            @Valid @RequestBody UpdateAdminRequest request,
+            @PathVariable Long adminId
+    ) {
+        UpdateAdminResponse response = adminService.update(request, adminId);
         return ResponseEntity.ok(response);
     }
 }

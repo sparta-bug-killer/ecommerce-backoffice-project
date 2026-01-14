@@ -1,7 +1,9 @@
 package com.spartabugkiller.ecommercebackofficeproject.admin.entity;
 
+import com.spartabugkiller.ecommercebackofficeproject.admin.controller.UpdateAdminRequest;
 import com.spartabugkiller.ecommercebackofficeproject.global.common.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

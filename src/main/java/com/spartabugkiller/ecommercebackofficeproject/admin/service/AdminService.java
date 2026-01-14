@@ -48,10 +48,20 @@ public class AdminService {
         return SignupAdminResponse.from(saved);
     }
 
-    public AdminDetailResponse getAdmin(Long adminId) {
+    @Transactional(readOnly = true)
+    public GetAdminDetailResponse getAdmin(Long adminId) {
         // session 유저의 권환 학인 후 찾는다
         Admin admin = findById(adminId);
-        return AdminDetailResponse.from(admin);
+        return GetAdminDetailResponse.from(admin);
+    }
+
+    @Transactional
+    public UpdateAdminResponse update(@Valid UpdateAdminRequest request, Long adminId) {
+        // session 유저의 권한 확인 후 업데이트
+
+        Admin admin = findById(adminId);
+        admin.update(request);
+        return UpdateAdminResponse.from(admin);
     }
 
     public Admin findById(Long adminId) {

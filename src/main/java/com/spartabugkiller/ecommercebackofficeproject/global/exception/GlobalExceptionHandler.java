@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .orElse("입력 값이 올바르지 않습니다.");
 
-        ExceptionResponse response = ExceptionResponse.from(exception.getStatusCode().value(), exception.getMessage(), request.getRequestURI());
+        ExceptionResponse response = ExceptionResponse.from(exception.getStatusCode().value(), errorMessage, request.getRequestURI());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
