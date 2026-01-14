@@ -1,4 +1,4 @@
-package com.spartabugkiller.ecommercebackofficeproject.admin.controller;
+package com.spartabugkiller.ecommercebackofficeproject.admin.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
