@@ -1,51 +1,38 @@
 package com.spartabugkiller.ecommercebackofficeproject.customer.controller;
 
-import com.spartabugkiller.ecommercebackofficeproject.customer.dto.request.CustomerRequest;
-import com.spartabugkiller.ecommercebackofficeproject.customer.dto.response.CustomerResponse;
-import com.spartabugkiller.ecommercebackofficeproject.customer.entity.CustomerStatus;
+import com.spartabugkiller.ecommercebackofficeproject.customer.dto.CustomerResponseDto;
 import com.spartabugkiller.ecommercebackofficeproject.customer.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/customers")
 @RequiredArgsConstructor
-@RequestMapping("/api/admins/customers")
 public class CustomerController {
 
     private final CustomerService customerService;
 
-    @PostMapping("/signup")
-    public ResponseEntity<CustomerResponse> signUp(@RequestBody CustomerRequest request) {
-        return ResponseEntity.ok(customerService.signUp(request));
-    }
-
+    /**
+     * 고객 전체 목록 조회
+     */
     @GetMapping
-    public ResponseEntity<List<CustomerResponse>> getCustomerList() {
-        return ResponseEntity.ok(customerService.findAllCustomers());
+    public ResponseEntity<List<CustomerResponseDto>> getCustomers() {
+        List<CustomerResponseDto> responseDtos = customerService.getCustomers();
+        return ResponseEntity.ok(responseDtos);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<CustomerResponse> getCustomerDetail(@PathVariable Long id) {
-        return ResponseEntity.ok(customerService.findCustomerById(id));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<CustomerResponse> updateCustomer(@PathVariable Long id, @RequestBody CustomerRequest request) {
-        return ResponseEntity.ok(customerService.updateCustomer(id, request));
-    }
-
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<Void> changeStatus(@PathVariable Long id, @RequestParam CustomerStatus status) {
-        customerService.changeStatus(id, status);
-        return ResponseEntity.ok().build();
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
-        customerService.deleteCustomer(id);
-        return ResponseEntity.ok().build();
+    /**
+     * 특정 고객 상세 조회
+     */
+    @GetMapping("/{customerId}")
+    public ResponseEntity<CustomerResponseDto> getCustomer(@PathVariable Long customerId) {
+        CustomerResponseDto responseDto = customerService.getCustomer(customerId);
+        return ResponseEntity.ok(responseDto);
     }
 }

@@ -1,4 +1,4 @@
-package com.spartabugkiller.ecommercebackofficeproject.customer.dto.response;
+package com.spartabugkiller.ecommercebackofficeproject.customer.dto.request;
 
 import com.spartabugkiller.ecommercebackofficeproject.customer.entity.Customer;
 import com.spartabugkiller.ecommercebackofficeproject.customer.entity.CustomerStatus;
