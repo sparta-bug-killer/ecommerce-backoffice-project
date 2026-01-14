@@ -2,8 +2,10 @@ package com.spartabugkiller.ecommercebackofficeproject.admin.entity;
 
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRoleRequest;
+import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminStatusRequest;
 import com.spartabugkiller.ecommercebackofficeproject.global.common.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -45,5 +47,9 @@ public class Admin extends BaseEntity {
 
     public void updateRole(UpdateAdminRoleRequest request) {
         this.role = request.getRole() == null ? this.role : request.getRole();
+    }
+
+    public void updateStatus(@Valid UpdateAdminStatusRequest request) {
+        this.status = request.getStatus() == null ? this.status : request.getStatus();
     }
 }

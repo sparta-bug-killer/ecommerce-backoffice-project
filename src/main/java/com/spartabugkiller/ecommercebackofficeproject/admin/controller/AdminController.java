@@ -2,9 +2,11 @@ package com.spartabugkiller.ecommercebackofficeproject.admin.controller;
 
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRoleRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRequest;
+import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminStatusRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.GetAdminDetailResponse;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.UpdateAdminResponse;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.UpdateAdminRoleResponse;
+import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.UpdateAdminStatusResponse;
 import com.spartabugkiller.ecommercebackofficeproject.admin.service.AdminService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +41,15 @@ public class AdminController {
             @PathVariable Long adminId
             ) {
         UpdateAdminRoleResponse response = adminService.updateRole(request, adminId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{adminId}/status")
+    public ResponseEntity<UpdateAdminStatusResponse> updateAdminStatus(
+            @Valid @RequestBody UpdateAdminStatusRequest request,
+            @PathVariable Long adminId
+    ) {
+        UpdateAdminStatusResponse response = adminService.updateStatus(request, adminId);
         return ResponseEntity.ok(response);
     }
 }

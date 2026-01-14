@@ -2,13 +2,16 @@ package com.spartabugkiller.ecommercebackofficeproject.admin.service;
 
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRoleRequest;
+import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminStatusRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.GetAdminDetailResponse;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.UpdateAdminResponse;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.UpdateAdminRoleResponse;
+import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.UpdateAdminStatusResponse;
 import com.spartabugkiller.ecommercebackofficeproject.admin.entity.Admin;
 import com.spartabugkiller.ecommercebackofficeproject.admin.exception.AdminNotFoundException;
 import com.spartabugkiller.ecommercebackofficeproject.admin.repository.AdminRepository;
 import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +45,15 @@ public class AdminService {
         Admin admin = findById(adminId);
         admin.updateRole(request);
         return UpdateAdminRoleResponse.from(admin);
+    }
+
+    @Transactional
+    public UpdateAdminStatusResponse updateStatus(@Valid UpdateAdminStatusRequest request, Long adminId) {
+        // session 유저의 권한을 확인 후 업데이트
+
+        Admin admin = findById(adminId);
+        admin.updateStatus(request);
+        return UpdateAdminStatusResponse.from(admin);
     }
 
     public Admin findById(Long adminId) {
