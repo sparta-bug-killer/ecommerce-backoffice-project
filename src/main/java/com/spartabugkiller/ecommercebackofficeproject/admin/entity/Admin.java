@@ -1,7 +1,9 @@
 package com.spartabugkiller.ecommercebackofficeproject.admin.entity;
 
+import com.spartabugkiller.ecommercebackofficeproject.admin.controller.UpdateAdminRequest;
 import com.spartabugkiller.ecommercebackofficeproject.global.common.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -34,4 +36,10 @@ public class Admin extends BaseEntity {
     private LocalDateTime approvedAt;
     private LocalDateTime rejectedAt;
     private String rejectedReason;
+
+    public void update(@Valid UpdateAdminRequest request) {
+        this.name = request.getName() == null ? this.name : request.getName();
+        this.email = request.getEmail() == null ? this.email : request.getEmail();
+        this.phoneNumber = request.getPhoneNumber() == null ? this.phoneNumber : request.getPhoneNumber();
+    }
 }

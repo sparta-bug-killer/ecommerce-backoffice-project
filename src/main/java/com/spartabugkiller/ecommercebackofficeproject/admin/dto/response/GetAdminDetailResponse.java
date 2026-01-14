@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class AdminDetailResponse {
+public class GetAdminDetailResponse {
 
     private final Long id;
     private final String name;
@@ -21,8 +21,8 @@ public class AdminDetailResponse {
     private final LocalDateTime createdAt;
     private final LocalDateTime approvedAt;
 
-    public static AdminDetailResponse from(Admin admin) {
-        return AdminDetailResponse.builder()
+    public static GetAdminDetailResponse from(Admin admin) {
+        return GetAdminDetailResponse.builder()
                 .id(admin.getId())
                 .name(admin.getName())
                 .email(admin.getEmail())
