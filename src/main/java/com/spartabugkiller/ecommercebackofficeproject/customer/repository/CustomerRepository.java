@@ -1,4 +1,9 @@
 package com.spartabugkiller.ecommercebackofficeproject.customer.repository;
 
-public class CustomerRepository {
+import com.spartabugkiller.ecommercebackofficeproject.customer.entity.Customer;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface CustomerRepository extends JpaRepository<Customer, Long> {
+
+    boolean existsByEmail(String email);
 }
