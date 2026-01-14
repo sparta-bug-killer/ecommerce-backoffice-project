@@ -18,10 +18,8 @@ public class CustomerService {
 
     @Transactional
     public CustomerResponse signup(CustomerRequest request) {
-        // 수정된 생성자 사용
         Customer customer = new Customer(request);
-        Customer savedCustomer = customerRepository.save(customer);
-        return new CustomerResponse(savedCustomer);
+        return new CustomerResponse(customerRepository.save(customer));
     }
 
     @Transactional(readOnly = true)
@@ -29,5 +27,36 @@ public class CustomerService {
         return customerRepository.findAll().stream()
                 .map(CustomerResponse::new)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public CustomerResponse getCustomer(Long customerId) {
+        Customer customer = findCustomer(customerId);
+        return new CustomerResponse(customer);
+    }
+
+    @Transactional
+    public CustomerResponse updateCustomer(Long customerId, CustomerRequest request) {
+        Customer customer = findCustomer(customerId);
+        customer.update(request);
+        return new CustomerResponse(customer);
+    }
+
+    @Transactional
+    public CustomerResponse updateStatus(Long customerId, String status) {
+        Customer customer = findCustomer(customerId);
+        customer.updateStatus(status);
+        return new CustomerResponse(customer);
+    }
+
+    @Transactional
+    public void deleteCustomer(Long customerId) {
+        Customer customer = findCustomer(customerId);
+        customer.softDelete();
+    }
+
+    private Customer findCustomer(Long customerId) {
+        return customerRepository.findById(customerId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 고객이 존재하지 않습니다. ID: " + customerId));
     }
 }

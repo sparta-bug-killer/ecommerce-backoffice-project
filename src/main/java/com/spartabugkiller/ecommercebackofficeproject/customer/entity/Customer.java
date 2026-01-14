@@ -15,10 +15,6 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 에러 해결: 클래스 중괄호 안으로 들어왔습니다.
-    @Column(nullable = false)
-    private Boolean isDeleted = false;
-
     @Column(nullable = false)
     private String username;
 
@@ -28,11 +24,35 @@ public class Customer {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private String status = "ACTIVE"; // 기본 상태: ACTIVE
+
+    @Column(nullable = false)
+    private Boolean isDeleted = false;
+
     // 회원가입 생성자
     public Customer(CustomerRequest request) {
         this.username = request.getUsername();
         this.email = request.getEmail();
         this.password = request.getPassword();
-        this.isDeleted = false; // 저장 시 기본값 강제 주입
+        this.isDeleted = false;
+        this.status = "ACTIVE";
+    }
+
+    // 정보 수정 메서드
+    public void update(CustomerRequest request) {
+        this.username = request.getUsername();
+        this.email = request.getEmail();
+    }
+
+    // 상태 변경 메서드
+    public void updateStatus(String status) {
+        this.status = status;
+    }
+
+    // 논리 삭제 메서드
+    public void softDelete() {
+        this.isDeleted = true;
+        this.status = "DELETED";
     }
 }

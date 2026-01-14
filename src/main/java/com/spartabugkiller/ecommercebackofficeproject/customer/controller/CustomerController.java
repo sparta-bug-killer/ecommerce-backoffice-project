@@ -25,4 +25,25 @@ public class CustomerController {
     public ResponseEntity<List<CustomerResponse>> getCustomers() {
         return ResponseEntity.ok(customerService.getCustomers());
     }
+
+    @GetMapping("/{customerId}")
+    public ResponseEntity<CustomerResponse> getCustomer(@PathVariable Long customerId) {
+        return ResponseEntity.ok(customerService.getCustomer(customerId));
+    }
+
+    @PutMapping("/{customerId}")
+    public ResponseEntity<CustomerResponse> updateCustomer(@PathVariable Long customerId, @RequestBody CustomerRequest request) {
+        return ResponseEntity.ok(customerService.updateCustomer(customerId, request));
+    }
+
+    @PatchMapping("/{customerId}/status")
+    public ResponseEntity<CustomerResponse> updateStatus(@PathVariable Long customerId, @RequestParam String status) {
+        return ResponseEntity.ok(customerService.updateStatus(customerId, status));
+    }
+
+    @DeleteMapping("/{customerId}")
+    public ResponseEntity<String> deleteCustomer(@PathVariable Long customerId) {
+        customerService.deleteCustomer(customerId);
+        return ResponseEntity.ok("성공적으로 삭제 처리되었습니다.");
+    }
 }
