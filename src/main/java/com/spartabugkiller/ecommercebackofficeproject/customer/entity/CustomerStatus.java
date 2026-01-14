@@ -1,5 +1,5 @@
 package com.spartabugkiller.ecommercebackofficeproject.customer.entity;
 
 public enum CustomerStatus {
-    ACTIVE, BLACKLIST, WITHDRAWN
+    ACTIVE, BLACKLIST, WITHDRAWN,INACTIVE
 }

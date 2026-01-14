@@ -8,6 +8,4 @@ import lombok.NoArgsConstructor;
 public class CustomerRequest {
     private String name;
     private String email;
-    private String password;
-    private String phoneNumber;
 }
