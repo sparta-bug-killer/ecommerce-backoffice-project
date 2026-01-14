@@ -28,4 +28,11 @@ public class GlobalExceptionHandler {
         ExceptionResponse response = ExceptionResponse.from(exception.getStatusCode().value(), exception.getMessage(), request.getRequestURI());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+
+    @ExceptionHandler(AdminEmailAlreadyExistsException.class)
+    public ResponseEntity<String> handleAdminEmailAlreadyExists(AdminEmailAlreadyExistsException e) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(e.getMessage());
+    }
 }

@@ -1,13 +1,14 @@
 package com.spartabugkiller.ecommercebackofficeproject.admin.controller;
 
+import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.SignupAdminRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.AdminDetailResponse;
+import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.SignupAdminResponse;
 import com.spartabugkiller.ecommercebackofficeproject.admin.service.AdminService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,6 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminController {
 
     private final AdminService adminService;
+
+    // 관리자 회원가입 요청 API
+    @PostMapping("/signup")
+    public ResponseEntity<SignupAdminResponse> signup(@Valid @RequestBody SignupAdminRequest request) {
+        SignupAdminResponse response = adminService.signup(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 
     @GetMapping("/{adminId}")
     public ResponseEntity<AdminDetailResponse> getAdmin(@PathVariable Long adminId) {
