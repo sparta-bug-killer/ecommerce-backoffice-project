@@ -1,8 +1,6 @@
 package com.spartabugkiller.ecommercebackofficeproject.global.common;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -24,5 +22,11 @@ public class BaseEntity {
 
     private LocalDateTime deletedAt;
 
-    private boolean isDeleted;
+    @Column(nullable = false)
+    private boolean isDeleted = false;
+
+    public void delete() {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
+    }
 }
