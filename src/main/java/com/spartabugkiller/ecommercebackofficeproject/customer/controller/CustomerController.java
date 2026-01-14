@@ -3,11 +3,12 @@ package com.spartabugkiller.ecommercebackofficeproject.customer.controller;
 import com.spartabugkiller.ecommercebackofficeproject.customer.dto.request.CustomerRequest;
 import com.spartabugkiller.ecommercebackofficeproject.customer.dto.request.CustomerResponse;
 import com.spartabugkiller.ecommercebackofficeproject.customer.service.CustomerService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -17,13 +18,14 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @PostMapping("/signup")
-    public ResponseEntity<CustomerResponse> signup(@RequestBody CustomerRequest request) {
+    public ResponseEntity<CustomerResponse> signup(@Valid @RequestBody CustomerRequest request) {
         return ResponseEntity.ok(customerService.signup(request));
     }
 
+    // 에러 해결 지점: Pageable 인자 추가
     @GetMapping
-    public ResponseEntity<List<CustomerResponse>> getCustomers() {
-        return ResponseEntity.ok(customerService.getCustomers());
+    public ResponseEntity<Page<CustomerResponse>> getCustomers(Pageable pageable) {
+        return ResponseEntity.ok(customerService.getCustomers(pageable));
     }
 
     @GetMapping("/{customerId}")
@@ -32,7 +34,7 @@ public class CustomerController {
     }
 
     @PutMapping("/{customerId}")
-    public ResponseEntity<CustomerResponse> updateCustomer(@PathVariable Long customerId, @RequestBody CustomerRequest request) {
+    public ResponseEntity<CustomerResponse> updateCustomer(@PathVariable Long customerId, @Valid @RequestBody CustomerRequest request) {
         return ResponseEntity.ok(customerService.updateCustomer(customerId, request));
     }
 

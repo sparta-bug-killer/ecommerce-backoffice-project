@@ -1,6 +1,7 @@
 package com.spartabugkiller.ecommercebackofficeproject.customer.entity;
 
 import com.spartabugkiller.ecommercebackofficeproject.customer.dto.request.CustomerRequest;
+import com.spartabugkiller.ecommercebackofficeproject.global.common.BaseEntity; // BaseEntity 위치 확인 필요
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Table(name = "customers")
-public class Customer {
+public class Customer extends BaseEntity { // 상속 적용
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,34 +26,25 @@ public class Customer {
     private String password;
 
     @Column(nullable = false)
-    private String status = "ACTIVE"; // 기본 상태: ACTIVE
+    private String status = "ACTIVE";
 
-    @Column(nullable = false)
-    private Boolean isDeleted = false;
-
-    // 회원가입 생성자
     public Customer(CustomerRequest request) {
         this.username = request.getUsername();
         this.email = request.getEmail();
         this.password = request.getPassword();
-        this.isDeleted = false;
-        this.status = "ACTIVE";
     }
 
-    // 정보 수정 메서드
     public void update(CustomerRequest request) {
         this.username = request.getUsername();
         this.email = request.getEmail();
     }
 
-    // 상태 변경 메서드
     public void updateStatus(String status) {
         this.status = status;
     }
 
-    // 논리 삭제 메서드
+    // 논리 삭제: BaseEntity의 기능을 활용하거나 status 변경
     public void softDelete() {
-        this.isDeleted = true;
         this.status = "DELETED";
     }
 }

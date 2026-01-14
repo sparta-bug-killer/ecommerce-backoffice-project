@@ -5,10 +5,10 @@ import com.spartabugkiller.ecommercebackofficeproject.customer.dto.request.Custo
 import com.spartabugkiller.ecommercebackofficeproject.customer.entity.Customer;
 import com.spartabugkiller.ecommercebackofficeproject.customer.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,17 +22,16 @@ public class CustomerService {
         return new CustomerResponse(customerRepository.save(customer));
     }
 
+    // 페이징 적용된 목록 조회
     @Transactional(readOnly = true)
-    public List<CustomerResponse> getCustomers() {
-        return customerRepository.findAll().stream()
-                .map(CustomerResponse::new)
-                .toList();
+    public Page<CustomerResponse> getCustomers(Pageable pageable) {
+        return customerRepository.findAll(pageable)
+                .map(CustomerResponse::new);
     }
 
     @Transactional(readOnly = true)
     public CustomerResponse getCustomer(Long customerId) {
-        Customer customer = findCustomer(customerId);
-        return new CustomerResponse(customer);
+        return new CustomerResponse(findCustomer(customerId));
     }
 
     @Transactional
