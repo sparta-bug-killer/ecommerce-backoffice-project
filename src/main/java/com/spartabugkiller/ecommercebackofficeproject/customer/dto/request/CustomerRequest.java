@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class CustomerRequest {
-    private String name;
+    private String username;
     private String email;
+    private String password;
 }
