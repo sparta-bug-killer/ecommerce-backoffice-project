@@ -1,6 +1,5 @@
 package com.spartabugkiller.ecommercebackofficeproject.global.common;
 
-import com.spartabugkiller.ecommercebackofficeproject.admin.dto.SessionAdmin;
 import com.spartabugkiller.ecommercebackofficeproject.admin.entity.AdminRole;
 import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
 import com.spartabugkiller.ecommercebackofficeproject.global.exception.UnauthorizedException;

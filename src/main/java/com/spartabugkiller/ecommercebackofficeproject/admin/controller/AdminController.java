@@ -1,6 +1,6 @@
 package com.spartabugkiller.ecommercebackofficeproject.admin.controller;
 
-import com.spartabugkiller.ecommercebackofficeproject.admin.dto.SessionAdmin;
+import com.spartabugkiller.ecommercebackofficeproject.global.common.SessionAdmin;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.entity.AdminRole;
