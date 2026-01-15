@@ -104,4 +104,9 @@ public class Admin extends BaseEntity {
         this.status = request.getStatus();
         this.approvedBy = adminId;
     }
+
+    public void updatePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
+
 }

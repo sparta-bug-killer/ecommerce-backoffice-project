@@ -1,10 +1,15 @@
-package com.spartabugkiller.ecommercebackofficeproject.admin.exception;
+package com.spartabugkiller.ecommercebackofficeproject.common.exception;
 
 import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
-import com.spartabugkiller.ecommercebackofficeproject.global.exception.ServiceException;
+import lombok.Getter;
 
-public class AdminNotFoundException extends ServiceException {
+@Getter
+public class AdminNotFoundException extends RuntimeException {
+    private final ErrorCode errorCode;
+
+
     public AdminNotFoundException(ErrorCode errorCode) {
-        super(errorCode.getStatus(), errorCode.getMessage());
+        super(errorCode.getMessage());
+        this.errorCode = errorCode;
     }
 }

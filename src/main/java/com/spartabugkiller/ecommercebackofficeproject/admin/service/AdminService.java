@@ -1,5 +1,7 @@
 package com.spartabugkiller.ecommercebackofficeproject.admin.service;
 
+import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
+import com.spartabugkiller.ecommercebackofficeproject.common.exception.AdminNotFoundException;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.SessionAdmin;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.*;
@@ -168,5 +170,17 @@ public class AdminService {
         return adminRepository.findById(adminId).orElseThrow(
                 () -> new AdminNotFoundException(ErrorCode.ADMIN_NOT_FOUND)
         );
+    }
+
+    @Transactional
+    public UpdateAdminResponse updatePassword(UpdateAdminPasswordRequest request, Long adminId) {
+        // 1. 관리자 조회
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new AdminNotFoundException(ErrorCode.ADMIN_NOT_FOUND));
+
+        // 2. 비밀번호 변경 (실제로는 인코딩 로직 등이 들어가야 합니다)
+        admin.updatePassword(request.getNewPassword());
+
+        return UpdateAdminResponse.from(admin);
     }
 }
