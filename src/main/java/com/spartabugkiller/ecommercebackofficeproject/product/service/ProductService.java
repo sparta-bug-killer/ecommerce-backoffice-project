@@ -5,18 +5,16 @@ import com.spartabugkiller.ecommercebackofficeproject.admin.exception.AdminNotFo
 import com.spartabugkiller.ecommercebackofficeproject.admin.repository.AdminRepository;
 import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductCreateRequest;
+import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductStatusUpdateRequest;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductStockUpdateRequest;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductUpdateRequest;
-import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.GetProductResponse;
-import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.ProductCreateResponse;
-import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.ProductStockUpdateResponse;
+import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.*;
 import com.spartabugkiller.ecommercebackofficeproject.product.entity.Product;
 import com.spartabugkiller.ecommercebackofficeproject.product.entity.ProductCategory;
 import com.spartabugkiller.ecommercebackofficeproject.product.exception.CategoryNotFoundException;
 import com.spartabugkiller.ecommercebackofficeproject.product.exception.ProductNotFoundException;
 import com.spartabugkiller.ecommercebackofficeproject.product.repository.ProductCategoryRepository;
 import com.spartabugkiller.ecommercebackofficeproject.product.repository.ProductRepository;
-import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.ProductListResponse;
 import com.spartabugkiller.ecommercebackofficeproject.product.entity.ProductStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -150,7 +148,25 @@ public class ProductService {
         // 재고 변경 로직
         product.updateStock(request.getStock());
 
-        // ResponseDto로 변환해서 반환
+        // 응답 DTO 변환
         return ProductStockUpdateResponse.from(product);
+    }
+
+    /**
+     * 상품 상태 변경
+     */
+    @Transactional
+    public ProductStatusUpdateResponse updateProductStatus(Long productId, ProductStatusUpdateRequest request) {
+
+        // 예외 처리
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND)
+                );
+
+        // 상품 상태 변경
+        product.updateStatus(request.getStatus());
+
+        // 응답 DTO 변환
+        return ProductStatusUpdateResponse.from(product);
     }
 }
