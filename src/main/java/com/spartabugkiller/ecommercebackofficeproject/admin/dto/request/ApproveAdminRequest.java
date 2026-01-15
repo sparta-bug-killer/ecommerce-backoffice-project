@@ -7,5 +7,5 @@ import lombok.Getter;
 public class ApproveAdminRequest {
 
     private AdminStatus status;
-    private String rejected_reason;
+    private String rejectedReason;
 }
