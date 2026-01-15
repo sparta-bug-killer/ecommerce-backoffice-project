@@ -1,20 +1,25 @@
 package com.spartabugkiller.ecommercebackofficeproject.admin.service;
 
-import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
-import com.spartabugkiller.ecommercebackofficeproject.admin.exception.AdminNotFoundException;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.SessionAdmin;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.entity.Admin;
+import com.spartabugkiller.ecommercebackofficeproject.admin.entity.AdminRole;
 import com.spartabugkiller.ecommercebackofficeproject.admin.entity.AdminStatus;
 import com.spartabugkiller.ecommercebackofficeproject.admin.exception.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.repository.AdminRepository;
 import com.spartabugkiller.ecommercebackofficeproject.global.config.PasswordEncoder;
-import jakarta.servlet.http.HttpSession;
 import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -107,6 +112,22 @@ public class AdminService {
     @Transactional
     public void logout(HttpSession session) {
         session.invalidate();
+    }
+
+    @Transactional(readOnly = true)
+    public List<GetAdminsDetailResponse> getAdmins(String keyword, int page, Integer size, String sortBy, String order, AdminRole role, AdminStatus status) {
+        int pageSize = (size == null || size < 1) ? 10 : size;
+
+        Set<String> allowed = Set.of("name","email","createdAt","approvedAt");
+        String safeSortBy = allowed.contains(sortBy) ? sortBy : "createdAt";
+
+        Sort.Direction direction = "desc".equalsIgnoreCase(order) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort sort = Sort.by(direction, safeSortBy);
+        Pageable pageable = PageRequest.of(page, pageSize, sort);
+
+        return adminRepository.findAllAdmins(keyword, role, status, pageable).stream()
+                .map(GetAdminsDetailResponse::from)
+                .toList();
     }
 
     @Transactional(readOnly = true)
