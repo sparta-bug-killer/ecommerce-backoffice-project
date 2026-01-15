@@ -1,11 +1,12 @@
 package com.spartabugkiller.ecommercebackofficeproject.admin.dto.response;
 
 import com.spartabugkiller.ecommercebackofficeproject.admin.entity.Admin;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
+@Builder(access = AccessLevel.PROTECTED)
 public class UpdateAdminResponse {
 
     private final Long id;
