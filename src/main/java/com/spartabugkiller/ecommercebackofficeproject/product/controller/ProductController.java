@@ -1,8 +1,10 @@
 package com.spartabugkiller.ecommercebackofficeproject.product.controller;
 
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductUpdateRequest;
+import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductStockUpdateRequest;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.GetProductResponse;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.ProductListResponse;
+import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.ProductStockUpdateResponse;
 import com.spartabugkiller.ecommercebackofficeproject.product.entity.ProductStatus;
 import com.spartabugkiller.ecommercebackofficeproject.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -71,6 +73,7 @@ public class ProductController {
 
     /**
      * 상품 리스트 조회(관리자)
+     * 추후 세션검증 예정
      */
     @GetMapping("/products")
     public ResponseEntity<Page<ProductListResponse>> getProducts(
@@ -82,5 +85,20 @@ public class ProductController {
         return ResponseEntity.ok(
                 productService.getProducts(status, categoryId, keyword, pageable)
         );
+    }
+
+    /**
+     * 상품 재고 수정(관리자)
+     * 추후 세션검증 예정
+     */
+    @PatchMapping("/products/{id}/stock")
+    public ResponseEntity<ProductStockUpdateResponse> updateProductStock(
+            @PathVariable("id") Long productId,
+            @Valid @RequestBody ProductStockUpdateRequest request
+    ) {
+        ProductStockUpdateResponse response =
+                productService.updateProductStock(productId, request);
+
+        return ResponseEntity.ok(response);
     }
 }
