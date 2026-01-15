@@ -47,8 +47,7 @@ public class ProductController {
     public ResponseEntity<GetProductResponse> getProduct(
             @Valid @PathVariable Long id,
             HttpSession session) {
-        Long adminId = 1L;
-//                (Long) session.getAttribute("adminId");
+        Long adminId = (Long) session.getAttribute("adminId");
 
         GetProductResponse response = productService.getProduct(id, adminId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
