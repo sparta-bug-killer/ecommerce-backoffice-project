@@ -1,5 +1,6 @@
 package com.spartabugkiller.ecommercebackofficeproject.product.controller;
 
+import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductUpdateRequest;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductStockUpdateRequest;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.GetProductResponse;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.ProductListResponse;
@@ -47,11 +48,26 @@ public class ProductController {
      */
     @GetMapping("/products/{id}")
     public ResponseEntity<GetProductResponse> getProduct(
-            @Valid @PathVariable Long id,
+            @PathVariable Long id,
             HttpSession session) {
         Long adminId = (Long) session.getAttribute("adminId");
 
         GetProductResponse response = productService.getProduct(id, adminId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    /**
+     *  상품 정보 수정
+     */
+    @PatchMapping("/products/{id}")
+    public ResponseEntity<GetProductResponse> updateProduct(
+            @PathVariable Long id,
+            @Valid @RequestBody ProductUpdateRequest request,
+            HttpSession session) {
+        Long adminId = (Long) session.getAttribute("adminId");
+
+        GetProductResponse response = productService.updateProduct(id, request, adminId);
+
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
