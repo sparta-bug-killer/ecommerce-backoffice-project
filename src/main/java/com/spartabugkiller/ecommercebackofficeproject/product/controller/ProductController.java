@@ -72,6 +72,21 @@ public class ProductController {
     }
 
     /**
+     *  상품 삭제
+     */
+    @DeleteMapping("/products/{id}")
+    public ResponseEntity<Void> deleteProduct(
+            @PathVariable Long id,
+            HttpSession session) {
+        Long adminId = 1L;
+//                (Long) session.getAttribute("adminId");
+
+        productService.deleteProduct(id, adminId);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    /**
      * 상품 리스트 조회(관리자)
      * 추후 세션검증 예정
      */
