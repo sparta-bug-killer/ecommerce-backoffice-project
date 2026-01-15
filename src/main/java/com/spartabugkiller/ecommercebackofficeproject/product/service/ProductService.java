@@ -45,8 +45,6 @@ public class ProductService {
         ProductCategory category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new CategoryNotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
-
-
         Product product = Product.builder()
                 .name(request.getName())
                 .category(category)
@@ -72,6 +70,11 @@ public class ProductService {
         // 2. 상품 조회
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        // 소프트 삭제된 상품은 조회되지 않도록 처리
+        if (product.isDeleted()) {
+            throw new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND);
+        }
 
         return new GetProductResponse(product);
     }
@@ -105,6 +108,22 @@ public class ProductService {
         }
 
         return new GetProductResponse(product);
+    }
+
+    /**
+     *  상품 삭제
+     */
+    @Transactional
+    public void deleteProduct(Long productId, Long adminId) {
+        // 1. 관리자 확인
+        adminRepository.findById(adminId)
+                .orElseThrow(() -> new AdminNotFoundException(ErrorCode.ADMIN_NOT_FOUND));
+
+        // 2. 상품 조회
+        Product product = productRepository.findByIdAndIsDeletedFalse(productId)
+                .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        product.delete();
     }
 
     /**

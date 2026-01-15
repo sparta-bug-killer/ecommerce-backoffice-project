@@ -54,12 +54,6 @@ public class Product extends BaseEntity {
         this.category = category;
     }
 
-    public void updateProductInfo(String name, int price, ProductCategory category) {
-        this.name = name;
-        this.price = price;
-        this.category = category;
-    }
-
     public void changeName(String name) {
         if (name == null || name.isBlank()) {
             throw new ProductInvalidNameException(ErrorCode.INVALID_PRODUCT_NAME);

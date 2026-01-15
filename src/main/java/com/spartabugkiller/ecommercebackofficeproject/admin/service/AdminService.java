@@ -1,7 +1,7 @@
 package com.spartabugkiller.ecommercebackofficeproject.admin.service;
 
 import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
-import com.spartabugkiller.ecommercebackofficeproject.common.exception.AdminNotFoundException;
+import com.spartabugkiller.ecommercebackofficeproject.admin.exception.AdminNotFoundException;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.SessionAdmin;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.*;
