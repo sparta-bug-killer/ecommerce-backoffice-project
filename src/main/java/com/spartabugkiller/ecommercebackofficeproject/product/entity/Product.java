@@ -46,12 +46,15 @@ public class Product extends BaseEntity {
 
     @Builder
     public Product(String name, int price, int stock, ProductStatus status, Admin admin, ProductCategory category) {
+        if (name == null || name.isBlank()) throw new ProductInvalidNameException(ErrorCode.INVALID_PRODUCT_NAME);
+        if (price < 0) throw new ProductInvalidPriceException(ErrorCode.INVALID_PRODUCT_PRICE);
+
         this.name = name;
         this.price = price;
         this.stock = stock;
-        this.status = status;
         this.admin = admin;
         this.category = category;
+        this.status = ProductStatus.ON_SALE;
     }
 
     public void changeName(String name) {
