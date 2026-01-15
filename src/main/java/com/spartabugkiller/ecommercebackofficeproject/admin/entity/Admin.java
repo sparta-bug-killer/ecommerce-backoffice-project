@@ -3,6 +3,7 @@ package com.spartabugkiller.ecommercebackofficeproject.admin.entity;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRoleRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminStatusRequest;
+import com.spartabugkiller.ecommercebackofficeproject.admin.exception.AdminInactiveException;
 import com.spartabugkiller.ecommercebackofficeproject.global.common.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -38,6 +39,7 @@ public class Admin extends BaseEntity {
     private LocalDateTime approvedAt;
     private LocalDateTime rejectedAt;
     private String rejectedReason;
+    private LocalDateTime deletedAt;
 
     // 신규 관리자 생성 (무조건 PENDING)
     public Admin(String name, String email, String password, String phoneNumber, AdminRole role) {
@@ -49,23 +51,31 @@ public class Admin extends BaseEntity {
         this.status = AdminStatus.PENDING;
     }
 
-    // 승인 처리
+    // 승인 처리 (APPROVED)
     public void approve(Long superAdminId) {
         this.status = AdminStatus.APPROVED;
         this.approvedBy = superAdminId;
         this.approvedAt = LocalDateTime.now();
     }
 
-    // 거절 처리
+    // 거절 처리 (REJECTED)
     public void reject(String reason) {
         this.status = AdminStatus.REJECTED;
         this.rejectedAt = LocalDateTime.now();
         this.rejectedReason = reason;
     }
 
-    // 계정 비활성화 (Soft Delete)
+    // 계정 비활성화 (INACTIVE)
     public void deactivate() {
-        delete();
+        if (this.deletedAt != null) {
+            throw new AdminInactiveException();
+        }
+        this.status = AdminStatus.INACTIVE;
+    }
+
+    // Soft Delete
+    public void delete() {
+        this.deletedAt = LocalDateTime.now();
     }
 
     public void updateInfo(UpdateAdminRequest request) {

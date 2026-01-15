@@ -1,6 +1,8 @@
 package com.spartabugkiller.ecommercebackofficeproject.admin.controller;
 
+import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.SigninAdminRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.SignupAdminRequest;
+import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.SigninAdminResponse;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.SignupAdminResponse;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRoleRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRequest;
@@ -10,6 +12,7 @@ import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.UpdateA
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.UpdateAdminRoleResponse;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.UpdateAdminStatusResponse;
 import com.spartabugkiller.ecommercebackofficeproject.admin.service.AdminService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,6 +31,21 @@ public class AdminController {
     public ResponseEntity<SignupAdminResponse> signup(@Valid @RequestBody SignupAdminRequest request) {
         SignupAdminResponse response = adminService.signup(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    // 관리자 로그인 요청 API
+    @PostMapping("/signin")
+    public ResponseEntity<SigninAdminResponse> signin(
+            @Valid @RequestBody SigninAdminRequest request, HttpSession session
+    ) {
+        return ResponseEntity.ok(adminService.signin(request, session));
+    }
+
+    // 관리자 로그아웃 요청 API
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpSession session) {
+        adminService.logout(session);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{adminId}")
