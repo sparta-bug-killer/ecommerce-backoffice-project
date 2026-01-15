@@ -36,7 +36,9 @@ public class ProductController {
     public ResponseEntity<ProductCreateResponse> createProduct(
             @Valid @RequestBody ProductCreateRequest request,
             HttpSession session) {
-        Long adminId = (Long) session.getAttribute("adminId");
+
+        // 세션 검증, adminId 추출
+        Long adminId = SessionUtils.getLoginAdmin(session).getId();
 
         ProductCreateResponse response = productService.createProduct(request, adminId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -49,9 +51,11 @@ public class ProductController {
     public ResponseEntity<GetProductResponse> getProduct(
             @PathVariable Long id,
             HttpSession session) {
-        Long adminId = (Long) session.getAttribute("adminId");
 
-        GetProductResponse response = productService.getProduct(id, adminId);
+        // 세션 검증
+        SessionUtils.getLoginAdmin(session);
+
+        GetProductResponse response = productService.getProduct(id);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -63,25 +67,26 @@ public class ProductController {
             @PathVariable Long id,
             @Valid @RequestBody ProductUpdateRequest request,
             HttpSession session) {
-        Long adminId = (Long) session.getAttribute("adminId");
 
-        GetProductResponse response = productService.updateProduct(id, request, adminId);
+        // 세션 검증
+        SessionUtils.getLoginAdmin(session);
 
+        GetProductResponse response = productService.updateProduct(id, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**
-     *  상품 삭제
+     *  상품 삭제 (소프트 삭제)
      */
     @DeleteMapping("/products/{id}")
     public ResponseEntity<Void> deleteProduct(
             @PathVariable Long id,
             HttpSession session) {
-        Long adminId = 1L;
-//                (Long) session.getAttribute("adminId");
 
-        productService.deleteProduct(id, adminId);
+        // 세션 검증
+        SessionUtils.getLoginAdmin(session);
 
+        productService.deleteProduct(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

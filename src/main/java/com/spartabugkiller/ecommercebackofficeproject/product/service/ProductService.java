@@ -35,11 +35,11 @@ public class ProductService {
      */
     @Transactional
     public ProductCreateResponse createProduct(ProductCreateRequest request, Long adminId) {
-        // 1. 관리자 확인
+        // 관리자 확인
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new AdminNotFoundException(ErrorCode.ADMIN_NOT_FOUND));
 
-        // 2. 카테고리 조회
+        // 카테고리 조회
         ProductCategory category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new CategoryNotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
@@ -60,19 +60,10 @@ public class ProductService {
      *  상품 상세 조회
      */
     @Transactional(readOnly = true)
-    public GetProductResponse getProduct(Long productId, Long adminId) {
-        // 1. 관리자 확인
-        adminRepository.findById(adminId)
-                .orElseThrow(() -> new AdminNotFoundException(ErrorCode.ADMIN_NOT_FOUND));
-
-        // 2. 상품 조회
-        Product product = productRepository.findById(productId)
+    public GetProductResponse getProduct(Long productId) {
+        // 상품 조회
+        Product product = productRepository.findByIdAndIsDeletedFalse(productId)
                 .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
-
-        // 소프트 삭제된 상품은 조회되지 않도록 처리
-        if (product.isDeleted()) {
-            throw new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND);
-        }
 
         return new GetProductResponse(product);
     }
@@ -81,28 +72,24 @@ public class ProductService {
      *  상품 정보 수정
      */
     @Transactional
-    public GetProductResponse updateProduct(Long productId, ProductUpdateRequest request, Long adminId) {
-        // 1. 관리자 확인
-        adminRepository.findById(adminId)
-                .orElseThrow(() -> new AdminNotFoundException(ErrorCode.ADMIN_NOT_FOUND));
-
-        // 2. 상품 조회
-        Product product = productRepository.findById(productId)
+    public GetProductResponse updateProduct(Long productId, ProductUpdateRequest request) {
+        // 상품 조회
+        Product product = productRepository.findByIdAndIsDeletedFalse(productId)
                 .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
 
-        // 3. 변경할 카테고리 조회
-        if (request.getCategoryId() != null) {
-            ProductCategory category = categoryRepository.findById(request.getCategoryId())
-                    .orElseThrow(() -> new CategoryNotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
-            product.changeCategory(category);
-        }
-
+        // 입력된 필드만 선택적으로 수정
         if (request.getName() != null) {
             product.changeName(request.getName());
         }
 
         if (request.getPrice() != null) {
             product.changePrice(request.getPrice());
+        }
+
+        if (request.getCategoryId() != null) {
+            ProductCategory category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new CategoryNotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
+            product.changeCategory(category);
         }
 
         return new GetProductResponse(product);
@@ -112,12 +99,8 @@ public class ProductService {
      *  상품 삭제
      */
     @Transactional
-    public void deleteProduct(Long productId, Long adminId) {
-        // 1. 관리자 확인
-        adminRepository.findById(adminId)
-                .orElseThrow(() -> new AdminNotFoundException(ErrorCode.ADMIN_NOT_FOUND));
-
-        // 2. 상품 조회
+    public void deleteProduct(Long productId) {
+        // 상품 조회
         Product product = productRepository.findByIdAndIsDeletedFalse(productId)
                 .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
 
