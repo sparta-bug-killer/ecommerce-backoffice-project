@@ -5,10 +5,12 @@ import com.spartabugkiller.ecommercebackofficeproject.admin.exception.AdminNotFo
 import com.spartabugkiller.ecommercebackofficeproject.admin.repository.AdminRepository;
 import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductCreateRequest;
+import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.GetProductResponse;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.ProductCreateResponse;
 import com.spartabugkiller.ecommercebackofficeproject.product.entity.Product;
 import com.spartabugkiller.ecommercebackofficeproject.product.entity.ProductCategory;
 import com.spartabugkiller.ecommercebackofficeproject.product.exception.CategoryNotFoundException;
+import com.spartabugkiller.ecommercebackofficeproject.product.exception.ProductNotFoundException;
 import com.spartabugkiller.ecommercebackofficeproject.product.repository.ProductCategoryRepository;
 import com.spartabugkiller.ecommercebackofficeproject.product.repository.ProductRepository;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.ProductListResponse;
@@ -27,14 +29,20 @@ public class ProductService {
     private final ProductCategoryRepository categoryRepository;
     private final AdminRepository adminRepository;
 
-    /** 상품 등록 */
+    /**
+     *  상품 등록
+     */
     @Transactional
     public ProductCreateResponse createProduct(ProductCreateRequest request, Long adminId) {
+        // 1. 관리자 확인
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new AdminNotFoundException(ErrorCode.ADMIN_NOT_FOUND));
+
+        // 2. 예외 처리
         ProductCategory category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new CategoryNotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
-        Admin admin = adminRepository.findById(adminId)
-                .orElseThrow(() -> new AdminNotFoundException(ErrorCode.ADMIN_NOT_FOUND));
+
 
         Product product = Product.builder()
                 .name(request.getName())
@@ -47,6 +55,22 @@ public class ProductService {
 
         Product savedProduct = productRepository.save(product);
         return new ProductCreateResponse(savedProduct);
+    }
+
+    /**
+     *  상품 상세 조회
+     */
+    @Transactional(readOnly = true)
+    public GetProductResponse getProduct(Long productId, Long adminId) {
+        // 1. 관리자 확인
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new AdminNotFoundException(ErrorCode.ADMIN_NOT_FOUND));
+
+        // 2. 예외 처리
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        return new GetProductResponse(product);
     }
 
     /**
