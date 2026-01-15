@@ -92,4 +92,16 @@ public class Product extends BaseEntity {
             this.status = ProductStatus.ON_SALE;
         }
     }
+
+    // 상품 상태 변경(단종은 변경 불가)
+    public void updateStatus(ProductStatus newStatus) {
+
+        // 단종이면 상태 변경 불가
+        if (this.status == ProductStatus.DISCONTINUED) {
+            throw new ProductDiscontinuedException(ErrorCode.PRODUCT_DISCONTINUED);
+        }
+
+        // 판매중,품절 변경
+        this.status = newStatus;
+    }
 }
