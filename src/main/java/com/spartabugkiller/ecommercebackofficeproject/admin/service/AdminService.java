@@ -1,5 +1,6 @@
 package com.spartabugkiller.ecommercebackofficeproject.admin.service;
 
+import com.spartabugkiller.ecommercebackofficeproject.admin.dto.SessionAdmin;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.entity.Admin;
@@ -11,7 +12,6 @@ import com.spartabugkiller.ecommercebackofficeproject.global.exception.*;
 import jakarta.servlet.http.HttpSession;
 import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
 import org.springframework.transaction.annotation.Transactional;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -87,6 +87,9 @@ public class AdminService {
         if (admin.getStatus() == AdminStatus.INACTIVE) {
             throw new AdminInactiveException();
         }
+
+        // 세션에 로그인 정보 저장
+        session.setAttribute("LOGIN_ADMIN", SessionAdmin.from(admin));
 
         // 승인 처리 시 Response DTO로 변환해서 반환
         return new SigninAdminResponse(
