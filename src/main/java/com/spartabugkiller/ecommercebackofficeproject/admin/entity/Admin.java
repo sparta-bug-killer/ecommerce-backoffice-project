@@ -68,7 +68,7 @@ public class Admin extends BaseEntity {
 
     // 계정 비활성화 (INACTIVE)
     public void deactivate() {
-        if (this.deletedAt != null) {
+        if (getDeletedAt() != null) {
             throw new AdminInactiveException();
         }
         this.status = AdminStatus.INACTIVE;
