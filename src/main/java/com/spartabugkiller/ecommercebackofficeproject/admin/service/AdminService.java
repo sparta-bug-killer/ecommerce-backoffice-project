@@ -115,7 +115,9 @@ public class AdminService {
     }
 
     @Transactional(readOnly = true)
-    public List<GetAdminsDetailResponse> getAdmins(String keyword, int page, Integer size, String sortBy, String order, AdminRole role, AdminStatus status) {
+    public List<GetAdminsDetailResponse> getAdmins(SessionAdmin sessionAdmin, String keyword, int page, Integer size, String sortBy, String order, AdminRole role, AdminStatus status) {
+        validateLoginAdmin(sessionAdmin);
+
         int pageSize = (size == null || size < 1) ? 10 : size;
 
         Set<String> allowed = Set.of("name","email","createdAt","approvedAt");
@@ -131,50 +133,46 @@ public class AdminService {
     }
 
     @Transactional(readOnly = true)
-    public GetAdminDetailResponse getAdmin(Long adminId) {
-        // session 유저의 권환 학인 후 찾는다
+    public GetAdminDetailResponse getAdmin(SessionAdmin sessionAdmin, Long adminId) {
+        validateLoginAdmin(sessionAdmin);
         Admin admin = findById(adminId);
         return GetAdminDetailResponse.from(admin);
     }
 
-    public UpdateAdminResponse updateInfo(UpdateAdminRequest request, Long adminId) {
-        // session 유저의 권한 확인 후 업데이트
-
+    @Transactional
+    public UpdateAdminResponse updateInfo(SessionAdmin sessionAdmin, UpdateAdminRequest request, Long adminId) {
+        validateLoginAdmin(sessionAdmin);
         Admin admin = findById(adminId);
         admin.updateInfo(request);
         return UpdateAdminResponse.from(admin);
     }
 
     @Transactional
-    public UpdateAdminRoleResponse updateRole(UpdateAdminRoleRequest request, Long adminId) {
-        // session 유저의 권한을 확인 후 업데이트
-
+    public UpdateAdminRoleResponse updateRole(SessionAdmin sessionAdmin, UpdateAdminRoleRequest request, Long adminId) {
+        validateLoginAdmin(sessionAdmin);
         Admin admin = findById(adminId);
         admin.updateRole(request);
         return UpdateAdminRoleResponse.from(admin);
     }
 
     @Transactional
-    public UpdateAdminStatusResponse updateStatus(UpdateAdminStatusRequest request, Long adminId) {
-        // session 유저의 권한을 확인 후 업데이트
-
+    public UpdateAdminStatusResponse updateStatus(SessionAdmin sessionAdmin, UpdateAdminStatusRequest request, Long adminId) {
+        validateLoginAdmin(sessionAdmin);
         Admin admin = findById(adminId);
         admin.updateStatus(request);
         return UpdateAdminStatusResponse.from(admin);
     }
 
     @Transactional
-    public void deleteAdmin(Long adminId) {
-        // session 유저의 권한을 확인 후 삭제
-
+    public void deleteAdmin(SessionAdmin sessionAdmin, Long adminId) {
+        validateLoginAdmin(sessionAdmin);
         Admin admin = findById(adminId);
         admin.delete();
     }
 
     @Transactional
-    public ApproveAdminResponse approveAdmin(Long adminId, ApproveAdminRequest request) {
-        // session 유저의 권한을 확인 후 업데이트
-
+    public ApproveAdminResponse approveAdmin(SessionAdmin sessionAdmin, Long adminId, ApproveAdminRequest request) {
+        validateLoginAdmin(sessionAdmin);
         Admin admin = findById(adminId);
         if (request.getStatus() == AdminStatus.REJECTED) {
             admin.markAsRejected(request);
@@ -187,12 +185,6 @@ public class AdminService {
         return ApproveAdminResponse.from(admin);
     }
 
-    public Admin findById(Long adminId) {
-        return adminRepository.findById(adminId).orElseThrow(
-                () -> new AdminNotFoundException(ErrorCode.ADMIN_NOT_FOUND)
-        );
-    }
-
     @Transactional
     public UpdateAdminResponse updatePassword(UpdateAdminPasswordRequest request, Long adminId) {
         // 1. 관리자 조회
@@ -203,5 +195,17 @@ public class AdminService {
         admin.updatePassword(request.getNewPassword());
 
         return UpdateAdminResponse.from(admin);
+    }
+
+    private Admin findById(Long adminId) {
+        return adminRepository.findById(adminId).orElseThrow(
+                () -> new AdminNotFoundException(ErrorCode.ADMIN_NOT_FOUND)
+        );
+    }
+
+    private void validateLoginAdmin(SessionAdmin sessionAdmin) {
+        if (!sessionAdmin.getRole().equals(AdminRole.SUPER)) {
+            throw new NotSuperAdminException(ErrorCode.NOT_SUPER_ADMIN);
+        }
     }
 }

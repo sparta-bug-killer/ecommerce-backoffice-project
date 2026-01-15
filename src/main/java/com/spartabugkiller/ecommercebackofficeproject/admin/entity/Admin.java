@@ -91,11 +91,11 @@ public class Admin extends BaseEntity {
     }
 
     public void markAsRejected(ApproveAdminRequest request) {
-        if (request.getRejected_reason() == null) {
+        if (request.getRejectedReason() == null) {
             throw new RejectedReasonNotFoundException(ErrorCode.REJECTED_REASON_NOT_FOUND);
         }
         this.rejectedAt = LocalDateTime.now();
-        this.rejectedReason = request.getRejected_reason();
+        this.rejectedReason = request.getRejectedReason();
         this.status = AdminStatus.REJECTED;
     }
 

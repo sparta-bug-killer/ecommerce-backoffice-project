@@ -17,6 +17,7 @@ public enum ErrorCode {
     ADMIN_INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 올바르지 않습니다."),
     ADMIN_EMAIL_DUPLICATED(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
     REJECTED_REASON_NOT_FOUND(HttpStatus.NOT_FOUND, "거부 사유는 필수 입력값입니다."),
+    NOT_SUPER_ADMIN(HttpStatus.UNAUTHORIZED, "권한이 없는 관리자입니다."),
 
     // product exception,
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리입니다."),

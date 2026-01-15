@@ -1,5 +1,6 @@
 package com.spartabugkiller.ecommercebackofficeproject.admin.controller;
 
+import com.spartabugkiller.ecommercebackofficeproject.admin.dto.SessionAdmin;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.entity.AdminRole;
@@ -43,8 +44,12 @@ public class AdminController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * 관리자 리스트 조회 API
+     */
     @GetMapping
     public ResponseEntity<List<GetAdminsDetailResponse>> getAdmins(
+            @SessionAttribute(name = "LOGIN_ADMIN") SessionAdmin sessionAdmin,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "10") Integer size,
@@ -53,16 +58,20 @@ public class AdminController {
             @RequestParam(required = false) AdminRole role,
             @RequestParam(required = false) AdminStatus status
     ) {
+        System.out.println(sessionAdmin.getEmail());
         int pageIndex = Math.max(page - 1, 0);
-        List<GetAdminsDetailResponse> responseList = adminService.getAdmins(keyword, pageIndex, size, sortBy, order, role, status);
+        List<GetAdminsDetailResponse> responseList = adminService.getAdmins(sessionAdmin, keyword, pageIndex, size, sortBy, order, role, status);
         return ResponseEntity.ok(responseList);
     }
     /**
      * 관리자 상세 정보 조회 API
      */
     @GetMapping("/{adminId}")
-    public ResponseEntity<GetAdminDetailResponse> getAdmin(@PathVariable Long adminId) {
-        GetAdminDetailResponse response = adminService.getAdmin(adminId);
+    public ResponseEntity<GetAdminDetailResponse> getAdmin(
+            @SessionAttribute(name = "LOGIN_ADMIN") SessionAdmin sessionAdmin,
+            @PathVariable Long adminId
+    ) {
+        GetAdminDetailResponse response = adminService.getAdmin(sessionAdmin, adminId);
         return ResponseEntity.ok(response);
     }
 
@@ -71,10 +80,11 @@ public class AdminController {
      */
     @PatchMapping("/{adminId}")
     public ResponseEntity<UpdateAdminResponse> updateAdmin(
+            @SessionAttribute(name = "LOGIN_ADMIN") SessionAdmin sessionAdmin,
             @Valid @RequestBody UpdateAdminRequest request,
             @PathVariable Long adminId
     ) {
-        UpdateAdminResponse response = adminService.updateInfo(request, adminId);
+        UpdateAdminResponse response = adminService.updateInfo(sessionAdmin, request, adminId);
         return ResponseEntity.ok(response);
     }
 
@@ -83,10 +93,11 @@ public class AdminController {
      */
     @PatchMapping("/{adminId}/roles")
     public ResponseEntity<UpdateAdminRoleResponse>  updateAdminRole(
+            @SessionAttribute(name = "LOGIN_ADMIN") SessionAdmin sessionAdmin,
             @Valid @RequestBody UpdateAdminRoleRequest request,
             @PathVariable Long adminId
             ) {
-        UpdateAdminRoleResponse response = adminService.updateRole(request, adminId);
+        UpdateAdminRoleResponse response = adminService.updateRole(sessionAdmin, request, adminId);
         return ResponseEntity.ok(response);
     }
 
@@ -95,10 +106,11 @@ public class AdminController {
      */
     @PatchMapping("/{adminId}/status")
     public ResponseEntity<UpdateAdminStatusResponse> updateAdminStatus(
+            @SessionAttribute(name = "LOGIN_ADMIN") SessionAdmin sessionAdmin,
             @Valid @RequestBody UpdateAdminStatusRequest request,
             @PathVariable Long adminId
     ) {
-        UpdateAdminStatusResponse response = adminService.updateStatus(request, adminId);
+        UpdateAdminStatusResponse response = adminService.updateStatus(sessionAdmin, request, adminId);
         return ResponseEntity.ok(response);
     }
 
@@ -115,8 +127,11 @@ public class AdminController {
      * 관리자 삭제 API
      */
     @DeleteMapping("/{adminId}")
-    public ResponseEntity<Void> deleteAdmin(@PathVariable Long adminId) {
-        adminService.deleteAdmin(adminId);
+    public ResponseEntity<Void> deleteAdmin(
+            @SessionAttribute(name = "LOGIN_ADMIN") SessionAdmin sessionAdmin,
+            @PathVariable Long adminId
+    ) {
+        adminService.deleteAdmin(sessionAdmin, adminId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -125,10 +140,11 @@ public class AdminController {
      */
     @PatchMapping("/{adminId}/approve")
     public ResponseEntity<ApproveAdminResponse> approveAdmin(
+            @SessionAttribute(name = "LOGIN_ADMIN") SessionAdmin sessionAdmin,
             @PathVariable Long adminId,
             @Valid @RequestBody ApproveAdminRequest request
     ) {
-        ApproveAdminResponse response = adminService.approveAdmin(adminId, request);
+        ApproveAdminResponse response = adminService.approveAdmin(sessionAdmin, adminId, request);
         return ResponseEntity.ok(response);
     }
 }
