@@ -1,6 +1,7 @@
 package com.spartabugkiller.ecommercebackofficeproject.admin.service;
 
-import com.spartabugkiller.ecommercebackofficeproject.admin.dto.SessionAdmin;
+import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
+import com.spartabugkiller.ecommercebackofficeproject.admin.exception.AdminNotFoundException;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.entity.Admin;
@@ -9,14 +10,13 @@ import com.spartabugkiller.ecommercebackofficeproject.admin.entity.AdminStatus;
 import com.spartabugkiller.ecommercebackofficeproject.admin.exception.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.repository.AdminRepository;
 import com.spartabugkiller.ecommercebackofficeproject.global.config.PasswordEncoder;
-import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -58,7 +58,7 @@ public class AdminService {
 
     // 로그인 로직
     @Transactional(readOnly = true)
-    public SigninAdminResponse signin(SigninAdminRequest request, HttpSession session) {
+    public Admin signin(SigninAdminRequest request) {
 
         // 이메일 검증
         Admin admin = adminRepository.findByEmail(request.getEmail())
@@ -94,18 +94,8 @@ public class AdminService {
             throw new AdminInactiveException();
         }
 
-        // 세션에 로그인 정보 저장
-        session.setAttribute("LOGIN_ADMIN", SessionAdmin.from(admin));
-
         // 승인 처리 시 Response DTO로 변환해서 반환
-        return new SigninAdminResponse(
-                admin.getId(),
-                admin.getName(),
-                admin.getEmail(),
-                admin.getRole(),
-                admin.getStatus(),
-                admin.getCreatedAt()
-        );
+        return admin;
     }
 
     // 로그아웃 로직
