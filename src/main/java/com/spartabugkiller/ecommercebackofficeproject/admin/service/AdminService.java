@@ -1,7 +1,7 @@
 package com.spartabugkiller.ecommercebackofficeproject.admin.service;
 
 import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
-import com.spartabugkiller.ecommercebackofficeproject.common.exception.AdminNotFoundException;
+import com.spartabugkiller.ecommercebackofficeproject.admin.exception.AdminNotFoundException;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.SessionAdmin;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.*;
@@ -11,7 +11,6 @@ import com.spartabugkiller.ecommercebackofficeproject.admin.exception.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.repository.AdminRepository;
 import com.spartabugkiller.ecommercebackofficeproject.global.config.PasswordEncoder;
 import jakarta.servlet.http.HttpSession;
-import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -53,7 +52,7 @@ public class AdminService {
 
     // 로그인 로직
     @Transactional(readOnly = true)
-    public SigninAdminResponse signin(SigninAdminRequest request, HttpSession session) {
+    public Admin signin(SigninAdminRequest request) {
 
         // 이메일 검증
         Admin admin = adminRepository.findByEmail(request.getEmail())
@@ -89,18 +88,8 @@ public class AdminService {
             throw new AdminInactiveException();
         }
 
-        // 세션에 로그인 정보 저장
-        session.setAttribute("LOGIN_ADMIN", SessionAdmin.from(admin));
-
         // 승인 처리 시 Response DTO로 변환해서 반환
-        return new SigninAdminResponse(
-                admin.getId(),
-                admin.getName(),
-                admin.getEmail(),
-                admin.getRole(),
-                admin.getStatus(),
-                admin.getCreatedAt()
-        );
+        return admin;
     }
 
     // 로그아웃 로직

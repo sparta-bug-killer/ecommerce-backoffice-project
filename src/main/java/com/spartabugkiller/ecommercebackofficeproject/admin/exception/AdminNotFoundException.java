@@ -1,4 +1,4 @@
-package com.spartabugkiller.ecommercebackofficeproject.common.exception;
+package com.spartabugkiller.ecommercebackofficeproject.admin.exception;
 
 import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
 import lombok.Getter;

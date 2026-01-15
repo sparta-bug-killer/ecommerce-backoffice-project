@@ -11,6 +11,7 @@ import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRoleRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminStatusRequest;
+import com.spartabugkiller.ecommercebackofficeproject.admin.entity.Admin;
 import com.spartabugkiller.ecommercebackofficeproject.admin.service.AdminService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -36,9 +37,15 @@ public class AdminController {
     // 관리자 로그인 요청 API
     @PostMapping("/signin")
     public ResponseEntity<SigninAdminResponse> signin(
-            @Valid @RequestBody SigninAdminRequest request, HttpSession session
+            @Valid @RequestBody SigninAdminRequest request,
+            HttpSession session
     ) {
-        return ResponseEntity.ok(adminService.signin(request, session));
+        Admin admin = adminService.signin(request);
+
+        // 세션에 로그인 정보 저장
+        session.setAttribute("LOGIN_ADMIN", SessionAdmin.from(admin));
+
+        return ResponseEntity.ok(SigninAdminResponse.from(admin));
     }
 
     // 관리자 로그아웃 요청 API
