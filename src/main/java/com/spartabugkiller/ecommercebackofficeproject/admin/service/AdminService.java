@@ -7,11 +7,9 @@ import com.spartabugkiller.ecommercebackofficeproject.admin.entity.AdminStatus;
 import com.spartabugkiller.ecommercebackofficeproject.admin.exception.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.repository.AdminRepository;
 import com.spartabugkiller.ecommercebackofficeproject.global.config.PasswordEncoder;
-import com.spartabugkiller.ecommercebackofficeproject.global.exception.*;
 import jakarta.servlet.http.HttpSession;
 import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
 import org.springframework.transaction.annotation.Transactional;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -142,5 +140,17 @@ public class AdminService {
         return adminRepository.findById(adminId).orElseThrow(
                 () -> new AdminNotFoundException(ErrorCode.ADMIN_NOT_FOUND)
         );
+    }
+
+    @Transactional
+    public UpdateAdminResponse updatePassword(UpdateAdminPasswordRequest request, Long adminId) {
+        // 1. 관리자 조회
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new IllegalArgumentException("관리자를 찾을 수 없습니다."));
+
+        // 2. 비밀번호 변경 (실제로는 인코딩 로직 등이 들어가야 합니다)
+        admin.updatePassword(request.getNewPassword());
+
+        return UpdateAdminResponse.from(admin);
     }
 }

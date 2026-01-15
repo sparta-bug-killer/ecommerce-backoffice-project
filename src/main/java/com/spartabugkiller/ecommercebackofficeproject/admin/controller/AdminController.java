@@ -1,16 +1,13 @@
 package com.spartabugkiller.ecommercebackofficeproject.admin.controller;
 
+import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminPasswordRequest;
+import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminPasswordRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.SigninAdminRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.SignupAdminRequest;
-import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.SigninAdminResponse;
-import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.SignupAdminResponse;
+import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRoleRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminStatusRequest;
-import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.GetAdminDetailResponse;
-import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.UpdateAdminResponse;
-import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.UpdateAdminRoleResponse;
-import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.UpdateAdminStatusResponse;
 import com.spartabugkiller.ecommercebackofficeproject.admin.service.AdminService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -78,6 +75,15 @@ public class AdminController {
             @PathVariable Long adminId
     ) {
         UpdateAdminStatusResponse response = adminService.updateStatus(request, adminId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{adminId}/password")
+    public ResponseEntity<UpdateAdminResponse> updateAdminPassword(
+            @Valid @RequestBody UpdateAdminPasswordRequest request, // 비밀번호용 DTO가 따로 있어야 합니다!
+            @PathVariable Long adminId
+    ) {
+        UpdateAdminResponse response = adminService.updatePassword(request, adminId);
         return ResponseEntity.ok(response);
     }
 }

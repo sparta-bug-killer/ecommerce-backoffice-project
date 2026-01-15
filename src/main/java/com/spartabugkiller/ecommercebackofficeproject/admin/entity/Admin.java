@@ -1,8 +1,7 @@
 package com.spartabugkiller.ecommercebackofficeproject.admin.entity;
 
 
-import com.spartabugkiller.ecommercebackofficeproject.admin.controller.UpdateAdminRequest;
-
+import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRoleRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminStatusRequest;
@@ -84,9 +83,9 @@ public class Admin extends BaseEntity {
     }
 
     public void updateInfo(UpdateAdminRequest request) {
-        this.name = request.getName() == null ? this.name : request.getName();
-        this.email = request.getEmail() == null ? this.email : request.getEmail();
-        this.phoneNumber = request.getPhoneNumber() == null ? this.phoneNumber : request.getPhoneNumber();
+        this.name = request.getName();
+        this.email = request.getEmail();
+        this.phoneNumber = request.getPhoneNumber();
     }
 
     public void updateRole(UpdateAdminRoleRequest request) {
@@ -96,4 +95,10 @@ public class Admin extends BaseEntity {
     public void updateStatus(@Valid UpdateAdminStatusRequest request) {
         this.status = request.getStatus() == null ? this.status : request.getStatus();
     }
+
+
+    public void updatePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
+
 }
