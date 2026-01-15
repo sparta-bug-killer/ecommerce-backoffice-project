@@ -1,16 +1,15 @@
 package com.spartabugkiller.ecommercebackofficeproject.admin.entity;
 
-
-import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRequest;
+import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.ApproveAdminRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRoleRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminStatusRequest;
-
 import com.spartabugkiller.ecommercebackofficeproject.admin.exception.AdminInactiveException;
-
+import com.spartabugkiller.ecommercebackofficeproject.admin.exception.RejectedReasonNotFoundException;
 import com.spartabugkiller.ecommercebackofficeproject.global.common.BaseEntity;
+import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -19,7 +18,7 @@ import java.time.LocalDateTime;
 @Getter
 @Entity
 @Table(name = "admins")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Admin extends BaseEntity {
 
     @Id
@@ -78,19 +77,33 @@ public class Admin extends BaseEntity {
     }
 
     public void updateInfo(UpdateAdminRequest request) {
-        this.name = request.getName();
-        this.email = request.getEmail();
-        this.phoneNumber = request.getPhoneNumber();
+        this.name = request.getName() == null ? this.name : request.getName();
+        this.email = request.getEmail() == null ? this.email : request.getEmail();
+        this.phoneNumber = request.getPhoneNumber() == null ? this.phoneNumber : request.getPhoneNumber();
     }
 
     public void updateRole(UpdateAdminRoleRequest request) {
         this.role = request.getRole() == null ? this.role : request.getRole();
     }
 
-    public void updateStatus(@Valid UpdateAdminStatusRequest request) {
+    public void updateStatus(UpdateAdminStatusRequest request) {
         this.status = request.getStatus() == null ? this.status : request.getStatus();
     }
 
+    public void markAsRejected(ApproveAdminRequest request) {
+        if (request.getRejected_reason() == null) {
+            throw new RejectedReasonNotFoundException(ErrorCode.REJECTED_REASON_NOT_FOUND);
+        }
+        this.rejectedAt = LocalDateTime.now();
+        this.rejectedReason = request.getRejected_reason();
+        this.status = AdminStatus.REJECTED;
+    }
+
+    public void markAsApproved(ApproveAdminRequest request, Long adminId) {
+        this.approvedAt = LocalDateTime.now();
+        this.status = request.getStatus();
+        this.approvedBy = adminId;
+    }
 
     public void updatePassword(String encodedPassword) {
         this.password = encodedPassword;

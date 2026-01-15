@@ -16,8 +16,9 @@ public enum ErrorCode {
     ADMIN_INVALID_EMAIL(HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 올바르지 않습니다."),
     ADMIN_INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 올바르지 않습니다."),
     ADMIN_EMAIL_DUPLICATED(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
+    REJECTED_REASON_NOT_FOUND(HttpStatus.NOT_FOUND, "거부 사유는 필수 입력값입니다."),
 
-    // product exception
+    // product exception,
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리입니다."),
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 상품입니다."),
     PRODUCT_DISCONTINUED(HttpStatus.BAD_REQUEST, "단종된 상품은 재고를 변경할 수 없습니다."),

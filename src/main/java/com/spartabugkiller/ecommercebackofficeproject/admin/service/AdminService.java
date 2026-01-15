@@ -142,6 +142,30 @@ public class AdminService {
         return UpdateAdminStatusResponse.from(admin);
     }
 
+    @Transactional
+    public void deleteAdmin(Long adminId) {
+        // session 유저의 권한을 확인 후 삭제
+
+        Admin admin = findById(adminId);
+        admin.delete();
+    }
+
+    @Transactional
+    public ApproveAdminResponse approveAdmin(Long adminId, ApproveAdminRequest request) {
+        // session 유저의 권한을 확인 후 업데이트
+
+        Admin admin = findById(adminId);
+        if (request.getStatus() == AdminStatus.REJECTED) {
+            admin.markAsRejected(request);
+        }
+
+        if (request.getStatus() == AdminStatus.APPROVED) {
+            admin.markAsApproved(request, 1L);
+        }
+
+        return ApproveAdminResponse.from(admin);
+    }
+
     public Admin findById(Long adminId) {
         return adminRepository.findById(adminId).orElseThrow(
                 () -> new AdminNotFoundException(ErrorCode.ADMIN_NOT_FOUND)
