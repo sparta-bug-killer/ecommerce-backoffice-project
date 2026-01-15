@@ -5,6 +5,7 @@ import com.spartabugkiller.ecommercebackofficeproject.admin.exception.AdminNotFo
 import com.spartabugkiller.ecommercebackofficeproject.admin.repository.AdminRepository;
 import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductCreateRequest;
+import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductUpdateRequest;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.GetProductResponse;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.ProductCreateResponse;
 import com.spartabugkiller.ecommercebackofficeproject.product.entity.Product;
@@ -38,7 +39,7 @@ public class ProductService {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new AdminNotFoundException(ErrorCode.ADMIN_NOT_FOUND));
 
-        // 2. 예외 처리
+        // 2. 카테고리 조회
         ProductCategory category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new CategoryNotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
@@ -63,12 +64,43 @@ public class ProductService {
     @Transactional(readOnly = true)
     public GetProductResponse getProduct(Long productId, Long adminId) {
         // 1. 관리자 확인
-        Admin admin = adminRepository.findById(adminId)
+        adminRepository.findById(adminId)
                 .orElseThrow(() -> new AdminNotFoundException(ErrorCode.ADMIN_NOT_FOUND));
 
-        // 2. 예외 처리
+        // 2. 상품 조회
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        return new GetProductResponse(product);
+    }
+
+    /**
+     *  상품 정보 수정
+     */
+    @Transactional
+    public GetProductResponse updateProduct(Long productId, ProductUpdateRequest request, Long adminId) {
+        // 1. 관리자 확인
+        adminRepository.findById(adminId)
+                .orElseThrow(() -> new AdminNotFoundException(ErrorCode.ADMIN_NOT_FOUND));
+
+        // 2. 상품 조회
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        // 3. 변경할 카테고리 조회
+        if (request.getCategoryId() != null) {
+            ProductCategory category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new CategoryNotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
+            product.changeCategory(category);
+        }
+
+        if (request.getName() != null) {
+            product.changeName(request.getName());
+        }
+
+        if (request.getPrice() != null) {
+            product.changePrice(request.getPrice());
+        }
 
         return new GetProductResponse(product);
     }
