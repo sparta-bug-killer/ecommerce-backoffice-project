@@ -7,11 +7,9 @@ import com.spartabugkiller.ecommercebackofficeproject.admin.entity.AdminStatus;
 import com.spartabugkiller.ecommercebackofficeproject.admin.exception.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.repository.AdminRepository;
 import com.spartabugkiller.ecommercebackofficeproject.global.config.PasswordEncoder;
-import com.spartabugkiller.ecommercebackofficeproject.global.exception.*;
 import jakarta.servlet.http.HttpSession;
 import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
 import org.springframework.transaction.annotation.Transactional;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -136,6 +134,30 @@ public class AdminService {
         Admin admin = findById(adminId);
         admin.updateStatus(request);
         return UpdateAdminStatusResponse.from(admin);
+    }
+
+    @Transactional
+    public void deleteAdmin(Long adminId) {
+        // session 유저의 권한을 확인 후 삭제
+
+        Admin admin = findById(adminId);
+        admin.delete();
+    }
+
+    @Transactional
+    public ApproveAdminResponse approveAdmin(Long adminId, ApproveAdminRequest request) {
+        // session 유저의 권한을 확인 후 업데이트
+
+        Admin admin = findById(adminId);
+        if (request.getStatus() == AdminStatus.REJECTED) {
+            admin.markAsRejected(request);
+        }
+
+        if (request.getStatus() == AdminStatus.APPROVED) {
+            admin.markAsApproved(request, 1L);
+        }
+
+        return ApproveAdminResponse.from(admin);
     }
 
     public Admin findById(Long adminId) {
