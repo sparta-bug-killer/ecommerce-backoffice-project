@@ -43,6 +43,9 @@ public class AdminController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * 관리자 리스트 조회 API
+     */
     @GetMapping
     public ResponseEntity<List<GetAdminsDetailResponse>> getAdmins(
             @RequestParam(required = false) String keyword,
