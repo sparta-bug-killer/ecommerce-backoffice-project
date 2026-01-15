@@ -1,5 +1,6 @@
 package com.spartabugkiller.ecommercebackofficeproject.product.controller;
 
+import com.spartabugkiller.ecommercebackofficeproject.global.common.SessionUtils;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductStatusUpdateRequest;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductUpdateRequest;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductStockUpdateRequest;
@@ -86,15 +87,18 @@ public class ProductController {
 
     /**
      * 상품 리스트 조회(관리자)
-     * 추후 세션검증 예정
      */
     @GetMapping("/products")
     public ResponseEntity<Page<ProductListResponse>> getProducts(
             @RequestParam(required = false) ProductStatus status,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) String keyword,
-            @PageableDefault(page = 0, size = 10) Pageable pageable
+            @PageableDefault(page = 0, size = 10) Pageable pageable,
+            HttpSession session
     ) {
+        // 세션 검증
+        SessionUtils.getLoginAdmin(session);
+
         return ResponseEntity.ok(
                 productService.getProducts(status, categoryId, keyword, pageable)
         );
@@ -107,8 +111,12 @@ public class ProductController {
     @PatchMapping("/products/{id}/stock")
     public ResponseEntity<ProductStockUpdateResponse> updateProductStock(
             @PathVariable("id") Long productId,
-            @Valid @RequestBody ProductStockUpdateRequest request
+            @Valid @RequestBody ProductStockUpdateRequest request,
+            HttpSession session
     ) {
+        // 세션 검증
+        SessionUtils.getLoginAdmin(session);
+
         ProductStockUpdateResponse response =
                 productService.updateProductStock(productId, request);
 
@@ -116,14 +124,17 @@ public class ProductController {
     }
 
     /**
-     * 상품 상태 변경(관리자)
-     * 추후 세션 검증 예정
+     * 상품 상태 변경(슈퍼 관리자)
      */
     @PatchMapping("/products/{id}/status")
     public ResponseEntity<ProductStatusUpdateResponse> updateProductStatus(
             @PathVariable("id") Long productId,
-            @Valid @RequestBody ProductStatusUpdateRequest request
+            @Valid @RequestBody ProductStatusUpdateRequest request,
+            HttpSession session
     ) {
+        // 슈퍼 관리자 세션 검증
+        SessionUtils.validateSuperAdmin(session);
+
         ProductStatusUpdateResponse response =
                 productService.updateProductStatus(productId, request);
 
