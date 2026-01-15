@@ -39,6 +39,35 @@ public class Admin extends BaseEntity {
     private LocalDateTime rejectedAt;
     private String rejectedReason;
 
+    // 신규 관리자 생성 (무조건 PENDING)
+    public Admin(String name, String email, String password, String phoneNumber, AdminRole role) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.phoneNumber = phoneNumber;
+        this.role = role;
+        this.status = AdminStatus.PENDING;
+    }
+
+    // 승인 처리
+    public void approve(Long superAdminId) {
+        this.status = AdminStatus.APPROVED;
+        this.approvedBy = superAdminId;
+        this.approvedAt = LocalDateTime.now();
+    }
+
+    // 거절 처리
+    public void reject(String reason) {
+        this.status = AdminStatus.REJECTED;
+        this.rejectedAt = LocalDateTime.now();
+        this.rejectedReason = reason;
+    }
+
+    // 계정 비활성화 (Soft Delete)
+    public void deactivate() {
+        delete();
+    }
+
     public void updateInfo(UpdateAdminRequest request) {
         this.name = request.getName() == null ? this.name : request.getName();
         this.email = request.getEmail() == null ? this.email : request.getEmail();

@@ -1,5 +1,7 @@
 package com.spartabugkiller.ecommercebackofficeproject.admin.controller;
 
+import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.SignupAdminRequest;
+import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.SignupAdminResponse;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRoleRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminStatusRequest;
@@ -10,6 +12,7 @@ import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.UpdateA
 import com.spartabugkiller.ecommercebackofficeproject.admin.service.AdminService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +22,13 @@ import org.springframework.web.bind.annotation.*;
 public class AdminController {
 
     private final AdminService adminService;
+
+    // 관리자 회원가입 요청 API
+    @PostMapping("/signup")
+    public ResponseEntity<SignupAdminResponse> signup(@Valid @RequestBody SignupAdminRequest request) {
+        SignupAdminResponse response = adminService.signup(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 
     @GetMapping("/{adminId}")
     public ResponseEntity<GetAdminDetailResponse> getAdmin(@PathVariable Long adminId) {
