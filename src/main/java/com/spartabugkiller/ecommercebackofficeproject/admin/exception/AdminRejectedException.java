@@ -1,11 +1,11 @@
 package com.spartabugkiller.ecommercebackofficeproject.admin.exception;
 
+import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
 import com.spartabugkiller.ecommercebackofficeproject.global.exception.ServiceException;
-import org.springframework.http.HttpStatus;
 
 public class AdminRejectedException extends ServiceException {
 
     public AdminRejectedException() {
-        super(HttpStatus.FORBIDDEN, "승인이 거절된 계정입니다.");
+        super( ErrorCode.ADMIN_REJECTED.getStatus(), ErrorCode.ADMIN_REJECTED.getMessage());
     }
 }
