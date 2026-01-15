@@ -1,4 +1,4 @@
-package com.spartabugkiller.ecommercebackofficeproject.admin.dto;
+package com.spartabugkiller.ecommercebackofficeproject.global.common;
 
 import com.spartabugkiller.ecommercebackofficeproject.admin.entity.Admin;
 import com.spartabugkiller.ecommercebackofficeproject.admin.entity.AdminRole;
@@ -12,7 +12,7 @@ public class SessionAdmin {
     private final String email;
     private final AdminRole role;
 
-    public SessionAdmin(Long id, String name,String email, AdminRole role) {
+    public SessionAdmin(Long id, String name, String email, AdminRole role) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -20,6 +20,11 @@ public class SessionAdmin {
     }
 
     public static SessionAdmin from(Admin admin) {
-        return new SessionAdmin(admin.getId(), admin.getName(), admin.getEmail(), admin.getRole());
+        return new SessionAdmin(
+                admin.getId(),
+                admin.getName(),
+                admin.getEmail(),
+                admin.getRole()
+        );
     }
 }
