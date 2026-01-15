@@ -2,10 +2,10 @@ package com.spartabugkiller.ecommercebackofficeproject.admin.service;
 
 import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
 import com.spartabugkiller.ecommercebackofficeproject.admin.exception.AdminNotFoundException;
-import com.spartabugkiller.ecommercebackofficeproject.admin.dto.SessionAdmin;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.entity.Admin;
+import com.spartabugkiller.ecommercebackofficeproject.admin.entity.AdminRole;
 import com.spartabugkiller.ecommercebackofficeproject.admin.entity.AdminStatus;
 import com.spartabugkiller.ecommercebackofficeproject.admin.exception.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.repository.AdminRepository;
@@ -13,7 +13,13 @@ import com.spartabugkiller.ecommercebackofficeproject.global.config.PasswordEnco
 import jakarta.servlet.http.HttpSession;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -99,6 +105,22 @@ public class AdminService {
     }
 
     @Transactional(readOnly = true)
+    public List<GetAdminsDetailResponse> getAdmins(String keyword, int page, Integer size, String sortBy, String order, AdminRole role, AdminStatus status) {
+        int pageSize = (size == null || size < 1) ? 10 : size;
+
+        Set<String> allowed = Set.of("name","email","createdAt","approvedAt");
+        String safeSortBy = allowed.contains(sortBy) ? sortBy : "createdAt";
+
+        Sort.Direction direction = "desc".equalsIgnoreCase(order) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort sort = Sort.by(direction, safeSortBy);
+        Pageable pageable = PageRequest.of(page, pageSize, sort);
+
+        return adminRepository.findAllAdmins(keyword, role, status, pageable).stream()
+                .map(GetAdminsDetailResponse::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public GetAdminDetailResponse getAdmin(Long adminId) {
         // session 유저의 권환 학인 후 찾는다
         Admin admin = findById(adminId);
@@ -129,6 +151,30 @@ public class AdminService {
         Admin admin = findById(adminId);
         admin.updateStatus(request);
         return UpdateAdminStatusResponse.from(admin);
+    }
+
+    @Transactional
+    public void deleteAdmin(Long adminId) {
+        // session 유저의 권한을 확인 후 삭제
+
+        Admin admin = findById(adminId);
+        admin.delete();
+    }
+
+    @Transactional
+    public ApproveAdminResponse approveAdmin(Long adminId, ApproveAdminRequest request) {
+        // session 유저의 권한을 확인 후 업데이트
+
+        Admin admin = findById(adminId);
+        if (request.getStatus() == AdminStatus.REJECTED) {
+            admin.markAsRejected(request);
+        }
+
+        if (request.getStatus() == AdminStatus.APPROVED) {
+            admin.markAsApproved(request, 1L);
+        }
+
+        return ApproveAdminResponse.from(admin);
     }
 
     public Admin findById(Long adminId) {

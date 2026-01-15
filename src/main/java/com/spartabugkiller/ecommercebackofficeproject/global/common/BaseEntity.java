@@ -24,6 +24,7 @@ public class BaseEntity {
 
     private LocalDateTime deletedAt;
 
+    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
     private boolean isDeleted;
 
     public void delete() {

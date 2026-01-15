@@ -5,18 +5,16 @@ import com.spartabugkiller.ecommercebackofficeproject.admin.exception.AdminNotFo
 import com.spartabugkiller.ecommercebackofficeproject.admin.repository.AdminRepository;
 import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductCreateRequest;
+import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductStatusUpdateRequest;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductStockUpdateRequest;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductUpdateRequest;
-import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.GetProductResponse;
-import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.ProductCreateResponse;
-import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.ProductStockUpdateResponse;
+import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.*;
 import com.spartabugkiller.ecommercebackofficeproject.product.entity.Product;
 import com.spartabugkiller.ecommercebackofficeproject.product.entity.ProductCategory;
 import com.spartabugkiller.ecommercebackofficeproject.product.exception.CategoryNotFoundException;
 import com.spartabugkiller.ecommercebackofficeproject.product.exception.ProductNotFoundException;
 import com.spartabugkiller.ecommercebackofficeproject.product.repository.ProductCategoryRepository;
 import com.spartabugkiller.ecommercebackofficeproject.product.repository.ProductRepository;
-import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.ProductListResponse;
 import com.spartabugkiller.ecommercebackofficeproject.product.entity.ProductStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -45,8 +43,6 @@ public class ProductService {
         ProductCategory category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new CategoryNotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
-
-
         Product product = Product.builder()
                 .name(request.getName())
                 .category(category)
@@ -72,6 +68,11 @@ public class ProductService {
         // 2. 상품 조회
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        // 소프트 삭제된 상품은 조회되지 않도록 처리
+        if (product.isDeleted()) {
+            throw new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND);
+        }
 
         return new GetProductResponse(product);
     }
@@ -108,6 +109,22 @@ public class ProductService {
     }
 
     /**
+     *  상품 삭제
+     */
+    @Transactional
+    public void deleteProduct(Long productId, Long adminId) {
+        // 1. 관리자 확인
+        adminRepository.findById(adminId)
+                .orElseThrow(() -> new AdminNotFoundException(ErrorCode.ADMIN_NOT_FOUND));
+
+        // 2. 상품 조회
+        Product product = productRepository.findByIdAndIsDeletedFalse(productId)
+                .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        product.delete();
+    }
+
+    /**
      *  상품 리스트 조회
      */
     @Transactional(readOnly = true)
@@ -131,7 +148,25 @@ public class ProductService {
         // 재고 변경 로직
         product.updateStock(request.getStock());
 
-        // ResponseDto로 변환해서 반환
+        // 응답 DTO 변환
         return ProductStockUpdateResponse.from(product);
+    }
+
+    /**
+     * 상품 상태 변경
+     */
+    @Transactional
+    public ProductStatusUpdateResponse updateProductStatus(Long productId, ProductStatusUpdateRequest request) {
+
+        // 예외 처리
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND)
+                );
+
+        // 상품 상태 변경
+        product.updateStatus(request.getStatus());
+
+        // 응답 DTO 변환
+        return ProductStatusUpdateResponse.from(product);
     }
 }

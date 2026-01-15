@@ -1,10 +1,9 @@
 package com.spartabugkiller.ecommercebackofficeproject.product.controller;
 
+import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductStatusUpdateRequest;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductUpdateRequest;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductStockUpdateRequest;
-import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.GetProductResponse;
-import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.ProductListResponse;
-import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.ProductStockUpdateResponse;
+import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.*;
 import com.spartabugkiller.ecommercebackofficeproject.product.entity.ProductStatus;
 import com.spartabugkiller.ecommercebackofficeproject.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductCreateRequest;
-import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.ProductCreateResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -72,6 +70,21 @@ public class ProductController {
     }
 
     /**
+     *  상품 삭제
+     */
+    @DeleteMapping("/products/{id}")
+    public ResponseEntity<Void> deleteProduct(
+            @PathVariable Long id,
+            HttpSession session) {
+        Long adminId = 1L;
+//                (Long) session.getAttribute("adminId");
+
+        productService.deleteProduct(id, adminId);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    /**
      * 상품 리스트 조회(관리자)
      * 추후 세션검증 예정
      */
@@ -98,6 +111,21 @@ public class ProductController {
     ) {
         ProductStockUpdateResponse response =
                 productService.updateProductStock(productId, request);
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 상품 상태 변경(관리자)
+     * 추후 세션 검증 예정
+     */
+    @PatchMapping("/products/{id}/status")
+    public ResponseEntity<ProductStatusUpdateResponse> updateProductStatus(
+            @PathVariable("id") Long productId,
+            @Valid @RequestBody ProductStatusUpdateRequest request
+    ) {
+        ProductStatusUpdateResponse response =
+                productService.updateProductStatus(productId, request);
 
         return ResponseEntity.ok(response);
     }
