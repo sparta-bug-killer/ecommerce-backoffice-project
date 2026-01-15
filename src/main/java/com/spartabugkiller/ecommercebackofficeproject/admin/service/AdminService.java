@@ -1,14 +1,7 @@
 package com.spartabugkiller.ecommercebackofficeproject.admin.service;
 
-import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.SigninAdminRequest;
-import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.SignupAdminRequest;
-import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.SigninAdminResponse;
-import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.SignupAdminResponse;
-import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRoleRequest;
-import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminStatusRequest;
-import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.GetAdminDetailResponse;
-import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.UpdateAdminRoleResponse;
-import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.UpdateAdminStatusResponse;
+import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.*;
+import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.entity.Admin;
 import com.spartabugkiller.ecommercebackofficeproject.admin.entity.AdminStatus;
 import com.spartabugkiller.ecommercebackofficeproject.admin.exception.*;
@@ -119,6 +112,14 @@ public class AdminService {
         return GetAdminDetailResponse.from(admin);
     }
 
+    public UpdateAdminResponse updateInfo(UpdateAdminRequest request, Long adminId) {
+        // session 유저의 권한 확인 후 업데이트
+
+        Admin admin = findById(adminId);
+        admin.updateInfo(request);
+        return UpdateAdminResponse.from(admin);
+    }
+
     @Transactional
     public UpdateAdminRoleResponse updateRole(UpdateAdminRoleRequest request, Long adminId) {
         // session 유저의 권한을 확인 후 업데이트
@@ -129,7 +130,7 @@ public class AdminService {
     }
 
     @Transactional
-    public UpdateAdminStatusResponse updateStatus(@Valid UpdateAdminStatusRequest request, Long adminId) {
+    public UpdateAdminStatusResponse updateStatus(UpdateAdminStatusRequest request, Long adminId) {
         // session 유저의 권한을 확인 후 업데이트
 
         Admin admin = findById(adminId);
