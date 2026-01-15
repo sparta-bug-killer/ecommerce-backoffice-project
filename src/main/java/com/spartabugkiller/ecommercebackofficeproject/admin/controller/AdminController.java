@@ -3,12 +3,9 @@ package com.spartabugkiller.ecommercebackofficeproject.admin.controller;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.SessionAdmin;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.*;
+import com.spartabugkiller.ecommercebackofficeproject.admin.entity.Admin;
 import com.spartabugkiller.ecommercebackofficeproject.admin.entity.AdminRole;
 import com.spartabugkiller.ecommercebackofficeproject.admin.entity.AdminStatus;
-import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRoleRequest;
-import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRequest;
-import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminStatusRequest;
-import com.spartabugkiller.ecommercebackofficeproject.admin.entity.Admin;
 import com.spartabugkiller.ecommercebackofficeproject.admin.service.AdminService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -59,7 +56,7 @@ public class AdminController {
      */
     @GetMapping
     public ResponseEntity<List<GetAdminsDetailResponse>> getAdmins(
-            @SessionAttribute(name = "LOGIN_ADMIN") SessionAdmin sessionAdmin,
+            HttpSession session,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "10") Integer size,
@@ -68,9 +65,8 @@ public class AdminController {
             @RequestParam(required = false) AdminRole role,
             @RequestParam(required = false) AdminStatus status
     ) {
-        System.out.println(sessionAdmin.getEmail());
         int pageIndex = Math.max(page - 1, 0);
-        List<GetAdminsDetailResponse> responseList = adminService.getAdmins(sessionAdmin, keyword, pageIndex, size, sortBy, order, role, status);
+        List<GetAdminsDetailResponse> responseList = adminService.getAdmins(session, keyword, pageIndex, size, sortBy, order, role, status);
         return ResponseEntity.ok(responseList);
     }
     /**
@@ -78,10 +74,10 @@ public class AdminController {
      */
     @GetMapping("/{adminId}")
     public ResponseEntity<GetAdminDetailResponse> getAdmin(
-            @SessionAttribute(name = "LOGIN_ADMIN") SessionAdmin sessionAdmin,
+            HttpSession session,
             @PathVariable Long adminId
     ) {
-        GetAdminDetailResponse response = adminService.getAdmin(sessionAdmin, adminId);
+        GetAdminDetailResponse response = adminService.getAdmin(session, adminId);
         return ResponseEntity.ok(response);
     }
 
@@ -90,11 +86,11 @@ public class AdminController {
      */
     @PatchMapping("/{adminId}")
     public ResponseEntity<UpdateAdminResponse> updateAdmin(
-            @SessionAttribute(name = "LOGIN_ADMIN") SessionAdmin sessionAdmin,
+            HttpSession session,
             @Valid @RequestBody UpdateAdminRequest request,
             @PathVariable Long adminId
     ) {
-        UpdateAdminResponse response = adminService.updateInfo(sessionAdmin, request, adminId);
+        UpdateAdminResponse response = adminService.updateInfo(session, request, adminId);
         return ResponseEntity.ok(response);
     }
 
@@ -103,11 +99,11 @@ public class AdminController {
      */
     @PatchMapping("/{adminId}/roles")
     public ResponseEntity<UpdateAdminRoleResponse>  updateAdminRole(
-            @SessionAttribute(name = "LOGIN_ADMIN") SessionAdmin sessionAdmin,
+            HttpSession session,
             @Valid @RequestBody UpdateAdminRoleRequest request,
             @PathVariable Long adminId
             ) {
-        UpdateAdminRoleResponse response = adminService.updateRole(sessionAdmin, request, adminId);
+        UpdateAdminRoleResponse response = adminService.updateRole(session, request, adminId);
         return ResponseEntity.ok(response);
     }
 
@@ -116,11 +112,11 @@ public class AdminController {
      */
     @PatchMapping("/{adminId}/status")
     public ResponseEntity<UpdateAdminStatusResponse> updateAdminStatus(
-            @SessionAttribute(name = "LOGIN_ADMIN") SessionAdmin sessionAdmin,
+            HttpSession session,
             @Valid @RequestBody UpdateAdminStatusRequest request,
             @PathVariable Long adminId
     ) {
-        UpdateAdminStatusResponse response = adminService.updateStatus(sessionAdmin, request, adminId);
+        UpdateAdminStatusResponse response = adminService.updateStatus(session, request, adminId);
         return ResponseEntity.ok(response);
     }
 
@@ -138,10 +134,10 @@ public class AdminController {
      */
     @DeleteMapping("/{adminId}")
     public ResponseEntity<Void> deleteAdmin(
-            @SessionAttribute(name = "LOGIN_ADMIN") SessionAdmin sessionAdmin,
+            HttpSession session,
             @PathVariable Long adminId
     ) {
-        adminService.deleteAdmin(sessionAdmin, adminId);
+        adminService.deleteAdmin(session, adminId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -150,11 +146,11 @@ public class AdminController {
      */
     @PatchMapping("/{adminId}/approve")
     public ResponseEntity<ApproveAdminResponse> approveAdmin(
-            @SessionAttribute(name = "LOGIN_ADMIN") SessionAdmin sessionAdmin,
+            HttpSession session,
             @PathVariable Long adminId,
             @Valid @RequestBody ApproveAdminRequest request
     ) {
-        ApproveAdminResponse response = adminService.approveAdmin(sessionAdmin, adminId, request);
+        ApproveAdminResponse response = adminService.approveAdmin(session, adminId, request);
         return ResponseEntity.ok(response);
     }
 }
