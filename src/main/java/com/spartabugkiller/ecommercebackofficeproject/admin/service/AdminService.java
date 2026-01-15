@@ -1,7 +1,5 @@
 package com.spartabugkiller.ecommercebackofficeproject.admin.service;
 
-import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
-import com.spartabugkiller.ecommercebackofficeproject.admin.exception.AdminNotFoundException;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.response.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.entity.Admin;
@@ -9,14 +7,16 @@ import com.spartabugkiller.ecommercebackofficeproject.admin.entity.AdminRole;
 import com.spartabugkiller.ecommercebackofficeproject.admin.entity.AdminStatus;
 import com.spartabugkiller.ecommercebackofficeproject.admin.exception.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.repository.AdminRepository;
+import com.spartabugkiller.ecommercebackofficeproject.global.common.SessionUtils;
 import com.spartabugkiller.ecommercebackofficeproject.global.config.PasswordEncoder;
+import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -105,8 +105,9 @@ public class AdminService {
     }
 
     @Transactional(readOnly = true)
-    public List<GetAdminsDetailResponse> getAdmins(SessionAdmin sessionAdmin, String keyword, int page, Integer size, String sortBy, String order, AdminRole role, AdminStatus status) {
-        validateLoginAdmin(sessionAdmin);
+    public List<GetAdminsDetailResponse> getAdmins(HttpSession session, String keyword, int page, Integer size, String sortBy, String order, AdminRole role, AdminStatus status) {
+        SessionUtils.getLoginAdmin(session);
+        SessionUtils.validateSuperAdmin(session);
 
         int pageSize = (size == null || size < 1) ? 10 : size;
 
@@ -123,46 +124,52 @@ public class AdminService {
     }
 
     @Transactional(readOnly = true)
-    public GetAdminDetailResponse getAdmin(SessionAdmin sessionAdmin, Long adminId) {
-        validateLoginAdmin(sessionAdmin);
+    public GetAdminDetailResponse getAdmin(HttpSession session, Long adminId) {
+        SessionUtils.getLoginAdmin(session);
+        SessionUtils.validateSuperAdmin(session);
         Admin admin = findById(adminId);
         return GetAdminDetailResponse.from(admin);
     }
 
     @Transactional
-    public UpdateAdminResponse updateInfo(SessionAdmin sessionAdmin, UpdateAdminRequest request, Long adminId) {
-        validateLoginAdmin(sessionAdmin);
+    public UpdateAdminResponse updateInfo(HttpSession session, UpdateAdminRequest request, Long adminId) {
+        SessionUtils.getLoginAdmin(session);
+        SessionUtils.validateSuperAdmin(session);
         Admin admin = findById(adminId);
         admin.updateInfo(request);
         return UpdateAdminResponse.from(admin);
     }
 
     @Transactional
-    public UpdateAdminRoleResponse updateRole(SessionAdmin sessionAdmin, UpdateAdminRoleRequest request, Long adminId) {
-        validateLoginAdmin(sessionAdmin);
+    public UpdateAdminRoleResponse updateRole(HttpSession session, UpdateAdminRoleRequest request, Long adminId) {
+        SessionUtils.getLoginAdmin(session);
+        SessionUtils.validateSuperAdmin(session);
         Admin admin = findById(adminId);
         admin.updateRole(request);
         return UpdateAdminRoleResponse.from(admin);
     }
 
     @Transactional
-    public UpdateAdminStatusResponse updateStatus(SessionAdmin sessionAdmin, UpdateAdminStatusRequest request, Long adminId) {
-        validateLoginAdmin(sessionAdmin);
+    public UpdateAdminStatusResponse updateStatus(HttpSession session, UpdateAdminStatusRequest request, Long adminId) {
+        SessionUtils.getLoginAdmin(session);
+        SessionUtils.validateSuperAdmin(session);
         Admin admin = findById(adminId);
         admin.updateStatus(request);
         return UpdateAdminStatusResponse.from(admin);
     }
 
     @Transactional
-    public void deleteAdmin(SessionAdmin sessionAdmin, Long adminId) {
-        validateLoginAdmin(sessionAdmin);
+    public void deleteAdmin(HttpSession session, Long adminId) {
+        SessionUtils.getLoginAdmin(session);
+        SessionUtils.validateSuperAdmin(session);
         Admin admin = findById(adminId);
         admin.delete();
     }
 
     @Transactional
-    public ApproveAdminResponse approveAdmin(SessionAdmin sessionAdmin, Long adminId, ApproveAdminRequest request) {
-        validateLoginAdmin(sessionAdmin);
+    public ApproveAdminResponse approveAdmin(HttpSession session, Long adminId, ApproveAdminRequest request) {
+        SessionUtils.getLoginAdmin(session);
+        SessionUtils.validateSuperAdmin(session);
         Admin admin = findById(adminId);
         if (request.getStatus() == AdminStatus.REJECTED) {
             admin.markAsRejected(request);
@@ -191,11 +198,5 @@ public class AdminService {
         return adminRepository.findById(adminId).orElseThrow(
                 () -> new AdminNotFoundException(ErrorCode.ADMIN_NOT_FOUND)
         );
-    }
-
-    private void validateLoginAdmin(SessionAdmin sessionAdmin) {
-        if (!sessionAdmin.getRole().equals(AdminRole.SUPER)) {
-            throw new NotSuperAdminException(ErrorCode.NOT_SUPER_ADMIN);
-        }
     }
 }
