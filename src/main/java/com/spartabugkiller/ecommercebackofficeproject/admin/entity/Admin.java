@@ -5,7 +5,9 @@ import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAd
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminRoleRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.dto.request.UpdateAdminStatusRequest;
 import com.spartabugkiller.ecommercebackofficeproject.admin.exception.AdminInactiveException;
+import com.spartabugkiller.ecommercebackofficeproject.admin.exception.RejectedReasonNotFoundException;
 import com.spartabugkiller.ecommercebackofficeproject.global.common.BaseEntity;
+import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -89,6 +91,9 @@ public class Admin extends BaseEntity {
     }
 
     public void markAsRejected(ApproveAdminRequest request) {
+        if (request.getRejected_reason() == null) {
+            throw new RejectedReasonNotFoundException(ErrorCode.REJECTED_REASON_NOT_FOUND);
+        }
         this.rejectedAt = LocalDateTime.now();
         this.rejectedReason = request.getRejected_reason();
         this.status = AdminStatus.REJECTED;
