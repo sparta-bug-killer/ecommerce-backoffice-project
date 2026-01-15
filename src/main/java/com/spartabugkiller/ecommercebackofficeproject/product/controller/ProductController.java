@@ -11,7 +11,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductCreateRequest;
+import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.ProductCreateResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
 
 @RestController
@@ -34,5 +39,15 @@ public class ProductController {
         return ResponseEntity.ok(
                 productService.getProducts(status, categoryId, keyword, pageable)
         );
+    }
+
+    @PostMapping("/products")
+    public ResponseEntity<ProductCreateResponse> createProduct(
+            @Valid @RequestBody ProductCreateRequest request,
+            HttpSession session) {
+        Long adminId = (Long) session.getAttribute("adminId");
+
+        ProductCreateResponse response = productService.createProduct(request, adminId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
