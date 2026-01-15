@@ -13,7 +13,9 @@ public enum ErrorCode {
 
     // product exception
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리입니다."),
-    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 상품입니다.");
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 상품입니다."),
+    PRODUCT_DISCONTINUED(HttpStatus.BAD_REQUEST, "단종된 상품은 재고를 변경할 수 없습니다.");
+
 
     private final HttpStatus status;
     private final String message;

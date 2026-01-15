@@ -5,8 +5,10 @@ import com.spartabugkiller.ecommercebackofficeproject.admin.exception.AdminNotFo
 import com.spartabugkiller.ecommercebackofficeproject.admin.repository.AdminRepository;
 import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductCreateRequest;
+import com.spartabugkiller.ecommercebackofficeproject.product.dto.request.ProductStockUpdateRequest;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.GetProductResponse;
 import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.ProductCreateResponse;
+import com.spartabugkiller.ecommercebackofficeproject.product.dto.response.ProductStockUpdateResponse;
 import com.spartabugkiller.ecommercebackofficeproject.product.entity.Product;
 import com.spartabugkiller.ecommercebackofficeproject.product.entity.ProductCategory;
 import com.spartabugkiller.ecommercebackofficeproject.product.exception.CategoryNotFoundException;
@@ -82,5 +84,22 @@ public class ProductService {
         return productRepository
                 .findProducts(categoryId, status, keyword, pageable)
                 .map(ProductListResponse::new);
+    }
+
+    /**
+     *  상품 재고 변경
+     */
+    @Transactional
+    public ProductStockUpdateResponse updateProductStock(Long productId, ProductStockUpdateRequest request) {
+
+        // 예외처리
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        // 재고 변경 로직
+        product.updateStock(request.getStock());
+
+        // ResponseDto로 변환해서 반환
+        return ProductStockUpdateResponse.from(product);
     }
 }
