@@ -15,6 +15,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
       join fetch r.product
       join fetch r.customer
       where r.id = :id
+          and  r.isDeleted = false
     """)
     Optional<Review> findDetailById(@Param("id") Long id);
 }
