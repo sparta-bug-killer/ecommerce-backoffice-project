@@ -106,7 +106,6 @@ public class AdminService {
 
     @Transactional(readOnly = true)
     public List<GetAdminsDetailResponse> getAdmins(HttpSession session, String keyword, int page, Integer size, String sortBy, String order, AdminRole role, AdminStatus status) {
-        SessionUtils.getLoginAdmin(session);
         SessionUtils.validateSuperAdmin(session);
 
         int pageSize = (size == null || size < 1) ? 10 : size;
@@ -125,7 +124,6 @@ public class AdminService {
 
     @Transactional(readOnly = true)
     public GetAdminDetailResponse getAdmin(HttpSession session, Long adminId) {
-        SessionUtils.getLoginAdmin(session);
         SessionUtils.validateSuperAdmin(session);
         Admin admin = findById(adminId);
         return GetAdminDetailResponse.from(admin);
@@ -133,7 +131,6 @@ public class AdminService {
 
     @Transactional
     public UpdateAdminResponse updateInfo(HttpSession session, UpdateAdminRequest request, Long adminId) {
-        SessionUtils.getLoginAdmin(session);
         SessionUtils.validateSuperAdmin(session);
         Admin admin = findById(adminId);
         admin.updateInfo(request);
@@ -142,7 +139,6 @@ public class AdminService {
 
     @Transactional
     public UpdateAdminRoleResponse updateRole(HttpSession session, UpdateAdminRoleRequest request, Long adminId) {
-        SessionUtils.getLoginAdmin(session);
         SessionUtils.validateSuperAdmin(session);
         Admin admin = findById(adminId);
         admin.updateRole(request);
@@ -151,7 +147,6 @@ public class AdminService {
 
     @Transactional
     public UpdateAdminStatusResponse updateStatus(HttpSession session, UpdateAdminStatusRequest request, Long adminId) {
-        SessionUtils.getLoginAdmin(session);
         SessionUtils.validateSuperAdmin(session);
         Admin admin = findById(adminId);
         admin.updateStatus(request);
@@ -160,7 +155,6 @@ public class AdminService {
 
     @Transactional
     public void deleteAdmin(HttpSession session, Long adminId) {
-        SessionUtils.getLoginAdmin(session);
         SessionUtils.validateSuperAdmin(session);
         Admin admin = findById(adminId);
         admin.delete();
@@ -168,7 +162,6 @@ public class AdminService {
 
     @Transactional
     public ApproveAdminResponse approveAdmin(HttpSession session, Long adminId, ApproveAdminRequest request) {
-        SessionUtils.getLoginAdmin(session);
         SessionUtils.validateSuperAdmin(session);
         Admin admin = findById(adminId);
         if (request.getStatus() == AdminStatus.REJECTED) {
