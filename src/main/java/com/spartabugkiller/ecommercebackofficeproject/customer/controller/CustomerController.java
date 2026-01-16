@@ -1,7 +1,7 @@
 package com.spartabugkiller.ecommercebackofficeproject.customer.controller;
 
 import com.spartabugkiller.ecommercebackofficeproject.customer.dto.request.CustomerRequest;
-import com.spartabugkiller.ecommercebackofficeproject.customer.dto.request.CustomerResponse;
+import com.spartabugkiller.ecommercebackofficeproject.customer.dto.response.CustomerResponse;
 import com.spartabugkiller.ecommercebackofficeproject.customer.service.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

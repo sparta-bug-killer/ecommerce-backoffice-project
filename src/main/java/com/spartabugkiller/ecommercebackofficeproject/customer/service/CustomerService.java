@@ -1,7 +1,7 @@
 package com.spartabugkiller.ecommercebackofficeproject.customer.service;
 
 import com.spartabugkiller.ecommercebackofficeproject.customer.dto.request.CustomerRequest;
-import com.spartabugkiller.ecommercebackofficeproject.customer.dto.request.CustomerResponse;
+import com.spartabugkiller.ecommercebackofficeproject.customer.dto.response.CustomerResponse;
 import com.spartabugkiller.ecommercebackofficeproject.customer.entity.Customer;
 import com.spartabugkiller.ecommercebackofficeproject.customer.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,37 +15,42 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomerService {
 
     private final CustomerRepository customerRepository;
+    // 나중에 팀원이 OrderRepository를 만들면 여기에 추가하세요!
+    // private final OrderRepository orderRepository;
 
     @Transactional
     public CustomerResponse signup(CustomerRequest request) {
         Customer customer = new Customer(request);
-        return new CustomerResponse(customerRepository.save(customer));
+        // 생성자가 바뀌었으므로 0L, 0L을 추가합니다.
+        return new CustomerResponse(customerRepository.save(customer), 0L, 0L);
     }
 
-    // 페이징 적용된 목록 조회
+    // 페이징 적용된 목록 조회 (도전 기능 반영)
     @Transactional(readOnly = true)
     public Page<CustomerResponse> getCustomers(Pageable pageable) {
         return customerRepository.findAll(pageable)
-                .map(CustomerResponse::new);
+                .map(customer -> new CustomerResponse(customer, 0L, 0L));
     }
 
+    // 상세 조회 (도전 기능 반영)
     @Transactional(readOnly = true)
     public CustomerResponse getCustomer(Long customerId) {
-        return new CustomerResponse(findCustomer(customerId));
+        Customer customer = findCustomer(customerId);
+        return new CustomerResponse(customer, 0L, 0L);
     }
 
     @Transactional
     public CustomerResponse updateCustomer(Long customerId, CustomerRequest request) {
         Customer customer = findCustomer(customerId);
         customer.update(request);
-        return new CustomerResponse(customer);
+        return new CustomerResponse(customer, 0L, 0L);
     }
 
     @Transactional
     public CustomerResponse updateStatus(Long customerId, String status) {
         Customer customer = findCustomer(customerId);
         customer.updateStatus(status);
-        return new CustomerResponse(customer);
+        return new CustomerResponse(customer, 0L, 0L);
     }
 
     @Transactional
