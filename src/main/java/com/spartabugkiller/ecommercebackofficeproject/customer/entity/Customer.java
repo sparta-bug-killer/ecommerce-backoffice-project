@@ -23,7 +23,7 @@ public class Customer extends BaseEntity { // 상속 적용
     private String email;
 
     @Column(nullable = false)
-    private String password;
+    private String phoneNumber;
 
     @Column(nullable = false)
     private String status = "ACTIVE";
@@ -31,7 +31,7 @@ public class Customer extends BaseEntity { // 상속 적용
     public Customer(CustomerRequest request) {
         this.username = request.getUsername();
         this.email = request.getEmail();
-        this.password = request.getPassword();
+        this.phoneNumber = request.getPhoneNumber();
     }
 
     public void update(CustomerRequest request) {
