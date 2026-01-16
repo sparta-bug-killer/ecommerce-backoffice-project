@@ -42,7 +42,6 @@ public class Admin extends BaseEntity {
     private LocalDateTime approvedAt;
     private LocalDateTime rejectedAt;
     private String rejectedReason;
-    private LocalDateTime deletedAt;
 
     // 신규 관리자 생성 (무조건 PENDING)
     public Admin(String name, String email, String password, String phoneNumber, AdminRole role) {
