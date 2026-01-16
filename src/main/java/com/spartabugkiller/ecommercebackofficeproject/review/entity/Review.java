@@ -44,15 +44,4 @@ public class Review extends BaseEntity {
         this.rating = rating;
         this.description = description;
     }
-
-    // 리뷰 수정
-    public void update(Integer rating, String description) {
-        this.rating = rating;
-        this.description = description;
-    }
-
-    // 리뷰 삭제
-    public void deleteReview() {
-        super.delete();
-    }
 }

@@ -4,11 +4,9 @@ import com.spartabugkiller.ecommercebackofficeproject.review.dto.response.GetRev
 import com.spartabugkiller.ecommercebackofficeproject.review.service.ReviewService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,5 +22,14 @@ public class ReviewController {
     ) {
         GetReviewDetailResponse response = reviewService.getReview(reviewId, session);
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/reviews/{reviewId}")
+    public ResponseEntity<Void> deleteReview(
+            @PathVariable Long reviewId,
+            HttpSession session
+    ) {
+        reviewService.deleteReview(reviewId, session);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
