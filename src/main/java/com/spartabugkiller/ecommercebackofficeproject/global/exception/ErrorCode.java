@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ErrorCode {
 
+    // admin exception
     ADMIN_BLOCKED(HttpStatus.LOCKED, "정지된 계정입니다."),
     ADMIN_PENDING(HttpStatus.FORBIDDEN, "승인 대기 중인 계정입니다."),
     ADMIN_REJECTED(HttpStatus.FORBIDDEN, "승인이 거절된 계정입니다."),
@@ -19,11 +20,10 @@ public enum ErrorCode {
     REJECTED_REASON_NOT_FOUND(HttpStatus.NOT_FOUND, "거부 사유는 필수 입력값입니다."),
     NOT_SUPER_ADMIN(HttpStatus.UNAUTHORIZED, "권한이 없는 관리자입니다."),
 
-    // product exception,
+    // product exception
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리입니다."),
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 상품입니다."),
     PRODUCT_DISCONTINUED(HttpStatus.BAD_REQUEST, "단종된 상품은 재고를 변경할 수 없습니다."),
-
     INVALID_PRODUCT_NAME(HttpStatus.BAD_REQUEST, "상품명은 비어 있을 수 없습니다."),
     INVALID_PRODUCT_PRICE(HttpStatus.BAD_REQUEST, "가격은 0 이상이어야 합니다."),
     INVALID_PRODUCT_CATEGORY(HttpStatus.BAD_REQUEST, "카테고리는 필수입니다."),
@@ -33,7 +33,13 @@ public enum ErrorCode {
 
     // global exception
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "관리자 로그인이 필요합니다."),
-    FORBIDDEN(HttpStatus.FORBIDDEN, "슈퍼 관리자 권한이 없습니다.");
+    FORBIDDEN(HttpStatus.FORBIDDEN, "슈퍼 관리자 권한이 없습니다."),
+
+    // order exception
+    ORDER_CUSTOMER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 고객입니다."),
+    ORDER_PRODUCT_DISCONTINUED(HttpStatus.BAD_REQUEST, "단종된 상품은 주문할 수 없습니다."),
+    ORDER_OUT_OF_STOCK(HttpStatus.BAD_REQUEST, "재고가 부족하여 주문이 불가능합니다."),
+    ORDER_QUANTITY_INVALID(HttpStatus.BAD_REQUEST, "주문 수량은 1개 이상이어야 합니다.");
 
     private final HttpStatus status;
     private final String message;
