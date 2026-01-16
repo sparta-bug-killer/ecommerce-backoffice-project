@@ -28,6 +28,9 @@ public enum ErrorCode {
     INVALID_PRODUCT_PRICE(HttpStatus.BAD_REQUEST, "가격은 0 이상이어야 합니다."),
     INVALID_PRODUCT_CATEGORY(HttpStatus.BAD_REQUEST, "카테고리는 필수입니다."),
 
+    // review exception
+    REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 리뷰를 찾을 수 없습니다."),
+
     // global exception
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "관리자 로그인이 필요합니다."),
     FORBIDDEN(HttpStatus.FORBIDDEN, "슈퍼 관리자 권한이 없습니다.");
