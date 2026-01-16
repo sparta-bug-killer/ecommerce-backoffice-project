@@ -5,10 +5,12 @@ import com.spartabugkiller.ecommercebackofficeproject.customer.entity.Customer;
 import com.spartabugkiller.ecommercebackofficeproject.product.entity.Product;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -16,12 +18,14 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "orders")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 주문번호 예시 : 20260116-001
     @Column(nullable = false, unique = true, length = 50)
     private String orderNum;
 
@@ -61,7 +65,15 @@ public class Order {
     @JoinColumn(name = "admin_id")
     private Admin admin;
 
-
-
-
+    @Builder
+    public Order(String orderNum, OrderStatus status, int totalPrice, int quantity,
+                 Customer customer, Product product, Admin admin) {
+        this.orderNum = orderNum;
+        this.status = status;
+        this.totalPrice = totalPrice;
+        this.quantity = quantity;
+        this.customer = customer;
+        this.product = product;
+        this.admin = admin;
+    }
 }

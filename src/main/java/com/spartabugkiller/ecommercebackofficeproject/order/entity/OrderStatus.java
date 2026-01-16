@@ -4,10 +4,15 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
 public enum OrderStatus {
-    READY,
-    SHIPPING,
-    COMPLETED,
-    CANCELED
+    READY("상품준비중"),
+    SHIPPING("배송중"),
+    COMPLETED("배송완료"),
+    CANCELED("주문취소");
+
+    private final String description;
+
+    OrderStatus(String description) {
+        this.description = description;
+    }
 }
