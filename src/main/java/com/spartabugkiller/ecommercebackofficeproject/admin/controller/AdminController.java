@@ -55,7 +55,7 @@ public class AdminController {
      * 관리자 리스트 조회 API
      */
     @GetMapping
-    public ResponseEntity<List<GetAdminsDetailResponse>> getAdmins(
+    public ResponseEntity<GetAdminsResponse> getAdmins(
             HttpSession session,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false, defaultValue = "1") Integer page,
@@ -66,7 +66,7 @@ public class AdminController {
             @RequestParam(required = false) AdminStatus status
     ) {
         int pageIndex = Math.max(page - 1, 0);
-        List<GetAdminsDetailResponse> responseList = adminService.getAdmins(session, keyword, pageIndex, size, sortBy, order, role, status);
+        GetAdminsResponse responseList = adminService.getAdmins(session, keyword, pageIndex, size, sortBy, order, role, status);
         return ResponseEntity.ok(responseList);
     }
     /**
