@@ -10,12 +10,12 @@ import java.util.List;
 @Builder
 public class GetAdminsResponse {
 
-    private final List<AdminItems> items;
+    private final List<AdminItems> admins;
     private final PageInfo pageInfo;
 
     public static GetAdminsResponse from(List<AdminItems> items, PageInfo pageInfo) {
         return GetAdminsResponse.builder()
-                .items(items)
+                .admins(items)
                 .pageInfo(pageInfo)
                 .build();
     }

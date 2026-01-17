@@ -1,11 +1,11 @@
 package com.spartabugkiller.ecommercebackofficeproject.review.controller;
 
+import com.spartabugkiller.ecommercebackofficeproject.global.dto.ApiResponse;
 import com.spartabugkiller.ecommercebackofficeproject.review.dto.response.GetReviewDetailResponse;
 import com.spartabugkiller.ecommercebackofficeproject.review.dto.response.GetReviewsResponse;
 import com.spartabugkiller.ecommercebackofficeproject.review.service.ReviewService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +17,7 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @GetMapping("/reviews")
-    public ResponseEntity<GetReviewsResponse> getReviews(
+    public ResponseEntity<ApiResponse<GetReviewsResponse>> getReviews(
             HttpSession session,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false, defaultValue = "1") Integer page,
@@ -28,24 +28,24 @@ public class ReviewController {
     ) {
         int pageIndex = Math.max(page - 1, 0);
         GetReviewsResponse response = reviewService.getReviews(session, keyword, pageIndex, size, sortBy, order, rating);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
     @GetMapping("/reviews/{reviewId}")
-    public ResponseEntity<GetReviewDetailResponse> getReview(
+    public ResponseEntity<ApiResponse<GetReviewDetailResponse>> getReview(
             @PathVariable Long reviewId,
             HttpSession session
     ) {
         GetReviewDetailResponse response = reviewService.getReview(reviewId, session);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
     @DeleteMapping("/reviews/{reviewId}")
-    public ResponseEntity<Void> deleteReview(
+    public ResponseEntity<ApiResponse<Void>> deleteReview(
             @PathVariable Long reviewId,
             HttpSession session
     ) {
         reviewService.deleteReview(reviewId, session);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.ok(ApiResponse.noContent());
     }
 }
