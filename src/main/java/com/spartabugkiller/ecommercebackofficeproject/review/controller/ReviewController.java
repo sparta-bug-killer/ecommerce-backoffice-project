@@ -2,6 +2,7 @@ package com.spartabugkiller.ecommercebackofficeproject.review.controller;
 
 import com.spartabugkiller.ecommercebackofficeproject.review.dto.response.GetReviewDetailResponse;
 import com.spartabugkiller.ecommercebackofficeproject.review.dto.response.ProductReviewResponse;
+import com.spartabugkiller.ecommercebackofficeproject.review.dto.response.GetReviewsResponse;
 import com.spartabugkiller.ecommercebackofficeproject.review.service.ReviewService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,21 @@ public class ReviewController {
             HttpSession session
     ) {
         ProductReviewResponse response = reviewService.getProductReviews(productId, session);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/reviews")
+    public ResponseEntity<GetReviewsResponse> getReviews(
+            HttpSession session,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false, defaultValue = "1") Integer page,
+            @RequestParam(required = false, defaultValue = "10") Integer size,
+            @RequestParam(required = false, defaultValue = "createdAt") String sortBy,
+            @RequestParam(required = false, defaultValue = "desc") String order,
+            @RequestParam(required = false) Integer rating
+    ) {
+        int pageIndex = Math.max(page - 1, 0);
+        GetReviewsResponse response = reviewService.getReviews(session, keyword, pageIndex, size, sortBy, order, rating);
         return ResponseEntity.ok(response);
     }
 
