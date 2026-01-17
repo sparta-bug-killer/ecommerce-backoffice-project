@@ -3,11 +3,14 @@ package com.spartabugkiller.ecommercebackofficeproject.admin.dto.response;
 import com.spartabugkiller.ecommercebackofficeproject.admin.entity.Admin;
 import com.spartabugkiller.ecommercebackofficeproject.admin.entity.AdminRole;
 import com.spartabugkiller.ecommercebackofficeproject.admin.entity.AdminStatus;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Builder(access = AccessLevel.PROTECTED)
 public class SignupAdminResponse {
 
     private final Long id;
@@ -17,23 +20,14 @@ public class SignupAdminResponse {
     private final AdminStatus status;
     private final LocalDateTime createdAt;
 
-    public SignupAdminResponse(Long id, String email, String phoneNumber, AdminRole role, AdminStatus status, LocalDateTime createdAt) {
-        this.id = id;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.role = role;
-        this.status = status;
-        this.createdAt = createdAt;
-    }
-
     public static SignupAdminResponse from(Admin admin) {
-        return new SignupAdminResponse(
-                admin.getId(),
-                admin.getEmail(),
-                admin.getPhoneNumber(),
-                admin.getRole(),
-                admin.getStatus(),
-                admin.getCreatedAt()
-        );
+        return SignupAdminResponse.builder()
+                .id(admin.getId())
+                .email(admin.getEmail())
+                .phoneNumber(admin.getPhoneNumber())
+                .role(admin.getRole())
+                .status(admin.getStatus())
+                .createdAt(admin.getCreatedAt())
+                .build();
     }
 }

@@ -23,14 +23,20 @@ public class AdminController {
 
     private final AdminService adminService;
 
-    // 관리자 회원가입 요청 API
+    /**
+     * 관리자 회원가입 API
+     */
     @PostMapping("/signup")
-    public ResponseEntity<SignupAdminResponse> signup(@Valid @RequestBody SignupAdminRequest request) {
+    public ResponseEntity<SignupAdminResponse> signup(
+            @Valid @RequestBody SignupAdminRequest request
+    ) {
         SignupAdminResponse response = adminService.signup(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // 관리자 로그인 요청 API
+    /**
+     * 관리자 로그인 API
+     */
     @PostMapping("/signin")
     public ResponseEntity<SigninAdminResponse> signin(
             @Valid @RequestBody SigninAdminRequest request,
@@ -44,9 +50,13 @@ public class AdminController {
         return ResponseEntity.ok(SigninAdminResponse.from(admin));
     }
 
-    // 관리자 로그아웃 요청 API
+    /**
+     * 관리자 로그아웃 API
+     */
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpSession session) {
+    public ResponseEntity<Void> logout(
+            HttpSession session
+    ) {
         adminService.logout(session);
         return ResponseEntity.ok().build();
     }
