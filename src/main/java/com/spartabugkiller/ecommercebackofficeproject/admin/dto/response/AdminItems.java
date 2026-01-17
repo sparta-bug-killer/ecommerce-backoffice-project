@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder(access = AccessLevel.PROTECTED)
-public class GetAdminsDetailResponse {
+public class AdminItems {
 
     private final Long id;
     private final String name;
@@ -22,8 +22,8 @@ public class GetAdminsDetailResponse {
     private final LocalDateTime createdAt;
     private final LocalDateTime approvedAt;
 
-    public static GetAdminsDetailResponse from(Admin admin) {
-        return GetAdminsDetailResponse.builder()
+    public static AdminItems from(Admin admin) {
+        return AdminItems.builder()
                 .id(admin.getId())
                 .name(admin.getName())
                 .email(admin.getEmail())

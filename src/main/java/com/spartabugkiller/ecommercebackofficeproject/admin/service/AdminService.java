@@ -9,17 +9,19 @@ import com.spartabugkiller.ecommercebackofficeproject.admin.exception.*;
 import com.spartabugkiller.ecommercebackofficeproject.admin.repository.AdminRepository;
 import com.spartabugkiller.ecommercebackofficeproject.global.common.SessionUtils;
 import com.spartabugkiller.ecommercebackofficeproject.global.config.PasswordEncoder;
+import com.spartabugkiller.ecommercebackofficeproject.global.dto.PageInfo;
 import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
+
+import static com.spartabugkiller.ecommercebackofficeproject.global.common.PageableUtils.makePageable;
 
 @Service
 @RequiredArgsConstructor
@@ -105,21 +107,23 @@ public class AdminService {
     }
 
     @Transactional(readOnly = true)
-    public List<GetAdminsDetailResponse> getAdmins(HttpSession session, String keyword, int page, Integer size, String sortBy, String order, AdminRole role, AdminStatus status) {
+    public GetAdminsResponse getAdmins(HttpSession session, String keyword, int page, Integer size, String sortBy, String order, AdminRole role, AdminStatus status) {
         SessionUtils.validateSuperAdmin(session);
 
         int pageSize = (size == null || size < 1) ? 10 : size;
 
         Set<String> allowed = Set.of("name","email","createdAt","approvedAt");
-        String safeSortBy = allowed.contains(sortBy) ? sortBy : "createdAt";
+        Pageable pageable = makePageable(page, sortBy, order, pageSize, allowed);
 
-        Sort.Direction direction = "desc".equalsIgnoreCase(order) ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Sort sort = Sort.by(direction, safeSortBy);
-        Pageable pageable = PageRequest.of(page, pageSize, sort);
+        Page<Admin> pageResult = adminRepository.findAllAdmins(keyword, role, status, pageable);
 
-        return adminRepository.findAllAdmins(keyword, role, status, pageable).stream()
-                .map(GetAdminsDetailResponse::from)
+        List<AdminItems> items = pageResult.getContent().stream()
+                .map(AdminItems::from)
                 .toList();
+
+        PageInfo pageInfo = PageInfo.from(pageResult);
+
+        return GetAdminsResponse.from(items, pageInfo);
     }
 
     @Transactional(readOnly = true)
