@@ -8,12 +8,10 @@ import com.spartabugkiller.ecommercebackofficeproject.customer.repository.Custom
 import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
 import com.spartabugkiller.ecommercebackofficeproject.order.dto.request.OrderCreateRequest;
 import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.OrderCreateResponse;
+import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.OrderDetailResponse;
 import com.spartabugkiller.ecommercebackofficeproject.order.entity.Order;
 import com.spartabugkiller.ecommercebackofficeproject.order.entity.OrderStatus;
-import com.spartabugkiller.ecommercebackofficeproject.order.exception.OrderCustomerNotFoundException;
-import com.spartabugkiller.ecommercebackofficeproject.order.exception.OrderOutOfStockException;
-import com.spartabugkiller.ecommercebackofficeproject.order.exception.OrderProductDiscontinuedException;
-import com.spartabugkiller.ecommercebackofficeproject.order.exception.OrderQuantityInvalidException;
+import com.spartabugkiller.ecommercebackofficeproject.order.exception.*;
 import com.spartabugkiller.ecommercebackofficeproject.order.repository.OrderRepository;
 import com.spartabugkiller.ecommercebackofficeproject.product.entity.Product;
 import com.spartabugkiller.ecommercebackofficeproject.product.entity.ProductStatus;
@@ -90,5 +88,11 @@ public class OrderService {
         if (product.getStock() < quantity) {
             throw new OrderOutOfStockException(ErrorCode.ORDER_OUT_OF_STOCK);
         }
+    }
+
+    public OrderDetailResponse getOrderDetail(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException(ErrorCode.ORDER_NOT_FOUND));
+        return new OrderDetailResponse(order);
     }
 }
