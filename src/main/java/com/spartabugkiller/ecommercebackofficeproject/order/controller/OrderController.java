@@ -3,16 +3,14 @@ package com.spartabugkiller.ecommercebackofficeproject.order.controller;
 import com.spartabugkiller.ecommercebackofficeproject.global.common.SessionUtils;
 import com.spartabugkiller.ecommercebackofficeproject.order.dto.request.OrderCreateRequest;
 import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.OrderCreateResponse;
+import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.OrderDetailResponse;
 import com.spartabugkiller.ecommercebackofficeproject.order.service.OrderService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/admins")
@@ -33,5 +31,15 @@ public class OrderController {
 
         OrderCreateResponse response = orderService.createOrder(request, adminId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    /**
+     * 주문 상세 조회
+     */
+    @GetMapping("/orders/{id}")
+    public ResponseEntity<OrderDetailResponse> getOrderDetail(
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(orderService.getOrderDetail(id));
     }
 }
