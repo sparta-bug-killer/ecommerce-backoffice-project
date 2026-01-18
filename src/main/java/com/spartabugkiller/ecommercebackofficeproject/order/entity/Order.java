@@ -76,4 +76,21 @@ public class Order {
         this.product = product;
         this.admin = admin;
     }
+
+    // 주문 상태 변경
+    public void changeStatus(OrderStatus newStatus) {
+
+        // 준비중 -> 배송중
+        if (this.status == OrderStatus.READY && newStatus == OrderStatus.SHIPPING) {
+            this.status = newStatus;
+            return;
+        }
+
+        // 배송중 -> 배송완료
+        if (this.status == OrderStatus.SHIPPING && newStatus == OrderStatus.COMPLETED) {
+            this.status = newStatus;
+            return;
+        }
+        throw new IllegalStateException("허용되지 않은 주문 상태 변경입니다.");
+    }
 }
