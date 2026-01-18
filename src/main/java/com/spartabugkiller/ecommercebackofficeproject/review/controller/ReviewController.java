@@ -21,12 +21,12 @@ public class ReviewController {
      * 상품별 리뷰 조회 API
      */
     @GetMapping("/products/{productId}/reviews")
-    public ResponseEntity<ProductReviewResponse> getProductDetailWithReviews(
+    public ResponseEntity<ApiResponse<ProductReviewResponse>> getProductDetailWithReviews(
             @PathVariable Long productId,
             HttpSession session
     ) {
         ProductReviewResponse response = reviewService.getProductReviews(productId, session);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
     @GetMapping("/reviews")
