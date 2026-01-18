@@ -2,6 +2,11 @@ package com.spartabugkiller.ecommercebackofficeproject.order.entity;
 
 import com.spartabugkiller.ecommercebackofficeproject.admin.entity.Admin;
 import com.spartabugkiller.ecommercebackofficeproject.customer.entity.Customer;
+import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
+import com.spartabugkiller.ecommercebackofficeproject.order.exception.OrderCancelNotAllowedException;
+import com.spartabugkiller.ecommercebackofficeproject.order.exception.OrderCancelReasonRequiredException;
+import com.spartabugkiller.ecommercebackofficeproject.order.exception.OrderOutOfStockException;
+import com.spartabugkiller.ecommercebackofficeproject.order.exception.OrderStatusChangeNotAllowedException;
 import com.spartabugkiller.ecommercebackofficeproject.product.entity.Product;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -91,6 +96,28 @@ public class Order {
             this.status = newStatus;
             return;
         }
-        throw new IllegalStateException("허용되지 않은 주문 상태 변경입니다.");
+        throw new OrderStatusChangeNotAllowedException(ErrorCode.ORDER_STATUS_CHANGE_NOT_ALLOWED);
     }
+
+    // 주문 취소
+    public void cancel(String cancelReason) {
+
+        // 상태 검증
+        if (this.status != OrderStatus.READY) {
+            throw new OrderCancelNotAllowedException(ErrorCode.ORDER_CANCEL_NOT_ALLOWED);
+        }
+
+        // 취소 사유 검증
+        if (cancelReason == null || cancelReason.isBlank()) {
+            throw new OrderCancelReasonRequiredException(ErrorCode.ORDER_CANCEL_REASON_REQUIRED);
+        }
+
+        // 상태 변경
+        this.status = OrderStatus.CANCELED;
+        // 취소 사유 저장
+        this.cancelReason = cancelReason;
+        // 취소 시간
+        this.canceledAt = LocalDateTime.now();
+    }
+
 }

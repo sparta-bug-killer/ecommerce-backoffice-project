@@ -36,6 +36,10 @@ public enum ErrorCode {
     FORBIDDEN(HttpStatus.FORBIDDEN, "슈퍼 관리자 권한이 없습니다."),
 
     // order exception
+    ORDER_STATUS_CHANGE_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "허용되지 않은 주문 상태 변경입니다."),
+    ORDER_CANCEL_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "준비중 상태에서만 주문 취소가 가능합니다."),
+    ORDER_CANCEL_REASON_REQUIRED(HttpStatus.BAD_REQUEST, "주문 취소 사유는 필수입니다."),
+
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않은 주문입니다."),
     ORDER_CUSTOMER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 고객입니다."),
     ORDER_PRODUCT_DISCONTINUED(HttpStatus.BAD_REQUEST, "단종된 상품은 주문할 수 없습니다."),

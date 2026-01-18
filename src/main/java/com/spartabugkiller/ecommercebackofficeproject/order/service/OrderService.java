@@ -6,12 +6,10 @@ import com.spartabugkiller.ecommercebackofficeproject.admin.repository.AdminRepo
 import com.spartabugkiller.ecommercebackofficeproject.customer.entity.Customer;
 import com.spartabugkiller.ecommercebackofficeproject.customer.repository.CustomerRepository;
 import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
+import com.spartabugkiller.ecommercebackofficeproject.order.dto.request.OrderCancelRequest;
 import com.spartabugkiller.ecommercebackofficeproject.order.dto.request.OrderCreateRequest;
 import com.spartabugkiller.ecommercebackofficeproject.order.dto.request.OrderStatusUpdateRequest;
-import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.OrderCreateResponse;
-import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.OrderDetailResponse;
-import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.OrderListResponse;
-import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.OrderStatusUpdateResponse;
+import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.*;
 import com.spartabugkiller.ecommercebackofficeproject.order.entity.Order;
 import com.spartabugkiller.ecommercebackofficeproject.order.entity.OrderStatus;
 import com.spartabugkiller.ecommercebackofficeproject.order.exception.*;
@@ -125,5 +123,22 @@ public class OrderService {
         order.changeStatus(request.getStatus());
 
         return OrderStatusUpdateResponse.from(order, beforeStatus);
+    }
+
+    @Transactional
+    public OrderCancelResponse cancelOrder(Long orderId, OrderCancelRequest request) {
+
+        // 예외처리
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException(ErrorCode.ORDER_NOT_FOUND));
+        OrderStatus beforeStatus = order.getStatus();
+
+        order.cancel(request.getCancelReason());
+
+        // 재고 복구
+        Product product = order.getProduct();
+        product.restoreStock(order.getQuantity());
+
+        return OrderCancelResponse.from(order, beforeStatus);
     }
 }

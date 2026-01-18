@@ -1,12 +1,10 @@
 package com.spartabugkiller.ecommercebackofficeproject.order.controller;
 
 import com.spartabugkiller.ecommercebackofficeproject.global.common.SessionUtils;
+import com.spartabugkiller.ecommercebackofficeproject.order.dto.request.OrderCancelRequest;
 import com.spartabugkiller.ecommercebackofficeproject.order.dto.request.OrderCreateRequest;
 import com.spartabugkiller.ecommercebackofficeproject.order.dto.request.OrderStatusUpdateRequest;
-import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.OrderCreateResponse;
-import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.OrderDetailResponse;
-import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.OrderListResponse;
-import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.OrderStatusUpdateResponse;
+import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.*;
 import com.spartabugkiller.ecommercebackofficeproject.order.entity.OrderStatus;
 import com.spartabugkiller.ecommercebackofficeproject.order.service.OrderService;
 import jakarta.servlet.http.HttpSession;
@@ -82,5 +80,19 @@ public class OrderController {
         SessionUtils.getLoginAdmin(session);
 
         return ResponseEntity.ok(orderService.updateOrderStatus(id, request));
+    }
+
+    /**
+     * 주문 취소
+     */
+    @PostMapping("/orders/{orderId}/cancel")
+    public ResponseEntity<OrderCancelResponse> cancelOrder(
+            @PathVariable Long orderId,
+            @Valid @RequestBody OrderCancelRequest request,
+            HttpSession session
+    ) {
+
+        SessionUtils.getLoginAdmin(session);
+        return ResponseEntity.ok(orderService.cancelOrder(orderId, request));
     }
 }

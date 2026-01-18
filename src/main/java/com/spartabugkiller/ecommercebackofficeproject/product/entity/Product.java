@@ -107,4 +107,20 @@ public class Product extends BaseEntity {
         // 판매중,품절 변경
         this.status = newStatus;
     }
+
+    // 주문 취소 시 재고 복구
+    public void restoreStock(int quantity) {
+
+        // 재고 복구
+        this.stock += quantity;
+
+        // 단종 상품이면 상태 변경 X
+        if (this.status == ProductStatus.DISCONTINUED) {
+            return;
+        }
+        // 재고가 0보다 커지면 판매중으로 전환
+        if (this.stock > 0) {
+            this.status = ProductStatus.ON_SALE;
+        }
+    }
 }
