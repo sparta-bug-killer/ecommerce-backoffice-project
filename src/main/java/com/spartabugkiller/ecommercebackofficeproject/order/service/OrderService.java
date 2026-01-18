@@ -9,6 +9,7 @@ import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode
 import com.spartabugkiller.ecommercebackofficeproject.order.dto.request.OrderCreateRequest;
 import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.OrderCreateResponse;
 import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.OrderDetailResponse;
+import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.OrderListResponse;
 import com.spartabugkiller.ecommercebackofficeproject.order.entity.Order;
 import com.spartabugkiller.ecommercebackofficeproject.order.entity.OrderStatus;
 import com.spartabugkiller.ecommercebackofficeproject.order.exception.*;
@@ -18,10 +19,10 @@ import com.spartabugkiller.ecommercebackofficeproject.product.entity.ProductStat
 import com.spartabugkiller.ecommercebackofficeproject.product.exception.ProductNotFoundException;
 import com.spartabugkiller.ecommercebackofficeproject.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -94,5 +95,14 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(ErrorCode.ORDER_NOT_FOUND));
         return new OrderDetailResponse(order);
+    }
+
+    /**
+     * 주문 리스트 조회
+     */
+    @Transactional(readOnly = true)
+    public Page<OrderListResponse> getOrderList(String keyword, OrderStatus status, Pageable pageable) {
+        Page<Order> orders = orderRepository.findWithFilters(keyword, status, pageable);
+        return orders.map(OrderListResponse::new);
     }
 }
