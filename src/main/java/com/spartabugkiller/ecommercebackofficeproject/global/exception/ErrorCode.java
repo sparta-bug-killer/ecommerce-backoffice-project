@@ -1,51 +1,51 @@
-package com.spartabugkiller.ecommercebackofficeproject.global.exception;
+    package com.spartabugkiller.ecommercebackofficeproject.global.exception;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+    import lombok.Getter;
+    import lombok.RequiredArgsConstructor;
+    import org.springframework.http.HttpStatus;
 
-@Getter
-@RequiredArgsConstructor
-public enum ErrorCode {
+    @Getter
+    @RequiredArgsConstructor
+    public enum ErrorCode {
 
-    // admin exception
-    ADMIN_BLOCKED(HttpStatus.LOCKED, "정지된 계정입니다."),
-    ADMIN_PENDING(HttpStatus.FORBIDDEN, "승인 대기 중인 계정입니다."),
-    ADMIN_REJECTED(HttpStatus.FORBIDDEN, "승인이 거절된 계정입니다."),
-    ADMIN_INACTIVE(HttpStatus.FORBIDDEN, "비활성화된 계정입니다."),
-    ADMIN_NOT_FOUND(HttpStatus.NOT_FOUND, "관리자를 찾을 수 없습니다."),
-    ADMIN_INVALID_EMAIL(HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 올바르지 않습니다."),
-    ADMIN_INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 올바르지 않습니다."),
-    ADMIN_EMAIL_DUPLICATED(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
-    REJECTED_REASON_NOT_FOUND(HttpStatus.NOT_FOUND, "거부 사유는 필수 입력값입니다."),
-    NOT_SUPER_ADMIN(HttpStatus.UNAUTHORIZED, "권한이 없는 관리자입니다."),
+        // admin exception
+        ADMIN_BLOCKED(HttpStatus.LOCKED, "정지된 계정입니다."),
+        ADMIN_PENDING(HttpStatus.FORBIDDEN, "승인 대기 중인 계정입니다."),
+        ADMIN_REJECTED(HttpStatus.FORBIDDEN, "승인이 거절된 계정입니다."),
+        ADMIN_INACTIVE(HttpStatus.FORBIDDEN, "비활성화된 계정입니다."),
+        ADMIN_NOT_FOUND(HttpStatus.NOT_FOUND, "관리자를 찾을 수 없습니다."),
+        ADMIN_INVALID_EMAIL(HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 올바르지 않습니다."),
+        ADMIN_INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 올바르지 않습니다."),
+        ADMIN_EMAIL_DUPLICATED(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
+        REJECTED_REASON_NOT_FOUND(HttpStatus.NOT_FOUND, "거부 사유는 필수 입력값입니다."),
+        NOT_SUPER_ADMIN(HttpStatus.UNAUTHORIZED, "권한이 없는 관리자입니다."),
 
-    // product exception
-    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리입니다."),
-    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 상품입니다."),
-    PRODUCT_DISCONTINUED(HttpStatus.BAD_REQUEST, "단종된 상품은 재고를 변경할 수 없습니다."),
-    INVALID_PRODUCT_NAME(HttpStatus.BAD_REQUEST, "상품명은 비어 있을 수 없습니다."),
-    INVALID_PRODUCT_PRICE(HttpStatus.BAD_REQUEST, "가격은 0 이상이어야 합니다."),
-    INVALID_PRODUCT_CATEGORY(HttpStatus.BAD_REQUEST, "카테고리는 필수입니다."),
+        // product exception
+        CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리입니다."),
+        PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 상품입니다."),
+        PRODUCT_DISCONTINUED(HttpStatus.BAD_REQUEST, "단종된 상품은 재고를 변경할 수 없습니다."),
+        INVALID_PRODUCT_NAME(HttpStatus.BAD_REQUEST, "상품명은 비어 있을 수 없습니다."),
+        INVALID_PRODUCT_PRICE(HttpStatus.BAD_REQUEST, "가격은 0 이상이어야 합니다."),
+        INVALID_PRODUCT_CATEGORY(HttpStatus.BAD_REQUEST, "카테고리는 필수입니다."),
 
-    // review exception
-    REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 리뷰를 찾을 수 없습니다."),
+        // review exception
+        REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 리뷰를 찾을 수 없습니다."),
 
-    // global exception
-    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "관리자 로그인이 필요합니다."),
-    FORBIDDEN(HttpStatus.FORBIDDEN, "슈퍼 관리자 권한이 없습니다."),
+        // global exception
+        UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "관리자 로그인이 필요합니다."),
+        FORBIDDEN(HttpStatus.FORBIDDEN, "슈퍼 관리자 권한이 없습니다."),
 
-    // order exception
-    ORDER_STATUS_CHANGE_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "허용되지 않은 주문 상태 변경입니다."),
-    ORDER_CANCEL_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "준비중 상태에서만 주문 취소가 가능합니다."),
-    ORDER_CANCEL_REASON_REQUIRED(HttpStatus.BAD_REQUEST, "주문 취소 사유는 필수입니다."),
+        // order exception
+        ORDER_STATUS_CHANGE_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "허용되지 않은 주문 상태 변경입니다."),
+        ORDER_CANCEL_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "준비중 상태에서만 주문 취소가 가능합니다."),
+        ORDER_CANCEL_REASON_REQUIRED(HttpStatus.BAD_REQUEST, "주문 취소 사유는 필수입니다."),
 
-    ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않은 주문입니다."),
-    ORDER_CUSTOMER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 고객입니다."),
-    ORDER_PRODUCT_DISCONTINUED(HttpStatus.BAD_REQUEST, "단종된 상품은 주문할 수 없습니다."),
-    ORDER_OUT_OF_STOCK(HttpStatus.BAD_REQUEST, "재고가 부족하여 주문이 불가능합니다."),
-    ORDER_QUANTITY_INVALID(HttpStatus.BAD_REQUEST, "주문 수량은 1개 이상이어야 합니다.");
-
-    private final HttpStatus status;
-    private final String message;
-}
+        ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않은 주문입니다."),
+        ORDER_CUSTOMER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 고객입니다."),
+        ORDER_PRODUCT_DISCONTINUED(HttpStatus.BAD_REQUEST, "단종된 상품은 주문할 수 없습니다."),
+        ORDER_OUT_OF_STOCK(HttpStatus.BAD_REQUEST, "재고가 부족하여 주문이 불가능합니다."),
+        ORDER_QUANTITY_INVALID(HttpStatus.BAD_REQUEST, "주문 수량은 1개 이상이어야 합니다."),
+        CUSTOMER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 고객을 찾을 수 없습니다.");
+        private final HttpStatus status;
+        private final String message;
+    }
