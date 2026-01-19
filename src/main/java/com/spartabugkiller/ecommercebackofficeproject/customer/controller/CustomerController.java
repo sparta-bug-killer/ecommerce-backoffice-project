@@ -2,62 +2,89 @@ package com.spartabugkiller.ecommercebackofficeproject.customer.controller;
 
 import com.spartabugkiller.ecommercebackofficeproject.customer.dto.request.CustomerRequest;
 import com.spartabugkiller.ecommercebackofficeproject.customer.dto.response.CustomerResponse;
+import com.spartabugkiller.ecommercebackofficeproject.customer.dto.response.GetCustomersResponse;
 import com.spartabugkiller.ecommercebackofficeproject.customer.entity.CustomerStatus;
 import com.spartabugkiller.ecommercebackofficeproject.customer.service.CustomerService;
 import com.spartabugkiller.ecommercebackofficeproject.global.dto.ApiResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/customers")
 @RequiredArgsConstructor
+@RequestMapping("/api/customers") // 팀 규격에 따라 /api/admins/customers로 바꿀 수도 있지만 일단 유지합니다.
 public class CustomerController {
 
     private final CustomerService customerService;
 
-    @PostMapping("/signup")
-    public ApiResponse<CustomerResponse> signup(@RequestBody CustomerRequest request) {
-        return ApiResponse.created(customerService.signup(request));
-    }
-
+    /**
+     * 고객 리스트 조회 API (검색, 페이징, 집계 포함)
+     */
     @GetMapping
-    public ApiResponse<Page<CustomerResponse>> getCustomers(
+    public ResponseEntity<ApiResponse<GetCustomersResponse>> getCustomers(
+            HttpSession session,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) CustomerStatus status,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String direction) {
-
-        Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
-        return ApiResponse.ok(customerService.getCustomers(keyword, status, pageable));
+            @RequestParam(required = false, defaultValue = "1") Integer page,
+            @RequestParam(required = false, defaultValue = "10") Integer size,
+            @RequestParam(required = false, defaultValue = "createdAt") String sortBy,
+            @RequestParam(required = false, defaultValue = "desc") String order
+    ) {
+        int pageIndex = Math.max(page - 1, 0);
+        GetCustomersResponse response = customerService.getCustomers(session, keyword, status, pageIndex, size, sortBy, order);
+        return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
-    @GetMapping("/{id}")
-    public ApiResponse<CustomerResponse> getCustomer(@PathVariable Long id) {
-        return ApiResponse.ok(customerService.getCustomerDetail(id));
+    /**
+     * 고객 상세 조회 API
+     */
+    @GetMapping("/{customerId}")
+    public ResponseEntity<ApiResponse<CustomerResponse>> getCustomer(
+            @PathVariable Long customerId,
+            HttpSession session
+    ) {
+        CustomerResponse response = customerService.getCustomerDetail(customerId, session);
+        return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
-    @PutMapping("/{id}")
-    public ApiResponse<String> updateCustomer(@PathVariable Long id, @RequestBody CustomerRequest request) {
-        customerService.updateCustomer(id, request);
-        return ApiResponse.ok("정보 수정이 완료되었습니다.");
+    /**
+     * 고객 정보 수정 API
+     */
+    @PatchMapping("/{customerId}")
+    public ResponseEntity<ApiResponse<CustomerResponse>> updateCustomer(
+            @PathVariable Long customerId,
+            @Valid @RequestBody CustomerRequest request,
+            HttpSession session
+    ) {
+        CustomerResponse response = customerService.updateCustomer(customerId, request, session);
+        return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
-    @PatchMapping("/{id}/status")
-    public ApiResponse<String> updateStatus(@PathVariable Long id, @RequestParam CustomerStatus status) {
-        customerService.updateStatus(id, status);
-        return ApiResponse.ok("상태 변경이 완료되었습니다.");
+    /**
+     * 고객 상태 변경 API
+     */
+    @PatchMapping("/{customerId}/status")
+    public ResponseEntity<ApiResponse<CustomerResponse>> updateStatus(
+            @PathVariable Long customerId,
+            @RequestParam CustomerStatus status,
+            HttpSession session
+    ) {
+        CustomerResponse response = customerService.updateStatus(customerId, status, session);
+        return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
-    @DeleteMapping("/{id}")
-    public ApiResponse<String> deleteCustomer(@PathVariable Long id) {
-        customerService.deleteCustomer(id);
-        return ApiResponse.ok("고객 삭제가 완료되었습니다.");
+    /**
+     * 고객 삭제(탈퇴) API
+     */
+    @DeleteMapping("/{customerId}")
+    public ResponseEntity<ApiResponse<Void>> deleteCustomer(
+            @PathVariable Long customerId,
+            HttpSession session
+    ) {
+        customerService.deleteCustomer(customerId, session);
+        return ResponseEntity.ok(ApiResponse.noContent());
     }
 }
