@@ -63,13 +63,28 @@ public class OrderController {
     public ResponseEntity<ApiResponse<Page<OrderListResponse>>> getOrderList(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) OrderStatus status,
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
-            HttpSession session) {
+            @RequestParam(required = false, defaultValue = "1") Integer page,
+            @RequestParam(required = false, defaultValue = "10") Integer size,
+            @RequestParam(required = false, defaultValue = "createdAt") String sortBy,
+            @RequestParam(required = false, defaultValue = "desc") String order,
+            HttpSession session
+    ) {
 
         SessionUtils.getLoginAdmin(session);
 
-        Page<OrderListResponse> responses = orderService.getOrderList(keyword, status, pageable);
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.ok(responses));
+        int pageIndex = Math.max(page - 1, 0);
+
+        Page<OrderListResponse> response =
+                orderService.getOrderList(
+                        keyword,
+                        status,
+                        pageIndex,
+                        size,
+                        sortBy,
+                        order
+                );
+
+        return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
     /**

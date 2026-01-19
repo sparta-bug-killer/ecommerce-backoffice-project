@@ -12,14 +12,14 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("""
                 SELECT o FROM Order o
-                JOIN FETCH o.customer c
-                JOIN FETCH o.product p
-                LEFT JOIN FETCH o.admin a
+                JOIN o.customer c
+                JOIN o.product p
+                LEFT JOIN o.admin a
                 WHERE (:status IS NULL OR o.status = :status)
-                AND(:keyword IS NULL OR o.orderNum LIKE %:keyword% OR c.username LIKE %:keyword%)
+                AND (:keyword IS NULL OR o.orderNum LIKE %:keyword% OR c.username LIKE %:keyword%)
             """)
-    Page<Order> findWithFilters (
-    @Param("keyword") String keyword,
-    @Param("status") OrderStatus status,
-    Pageable pageable);
+    Page<Order> findWithFilters(
+            @Param("keyword") String keyword,
+            @Param("status") OrderStatus status,
+            Pageable pageable);
 }

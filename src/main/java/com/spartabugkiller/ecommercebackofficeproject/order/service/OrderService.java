@@ -20,7 +20,9 @@ import com.spartabugkiller.ecommercebackofficeproject.product.exception.ProductN
 import com.spartabugkiller.ecommercebackofficeproject.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -110,8 +112,26 @@ public class OrderService {
      * 주문 리스트 조회
      */
     @Transactional(readOnly = true)
-    public Page<OrderListResponse> getOrderList(String keyword, OrderStatus status, Pageable pageable) {
-        Page<Order> orders = orderRepository.findWithFilters(keyword, status, pageable);
+    public Page<OrderListResponse> getOrderList(
+            String keyword,
+            OrderStatus status,
+            int page,
+            int size,
+            String sortBy,
+            String order
+    ) {
+        Sort sort = Sort.by(
+                "asc".equalsIgnoreCase(order)
+                        ? Sort.Direction.ASC
+                        : Sort.Direction.DESC,
+                sortBy
+        );
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Order> orders =
+                orderRepository.findWithFilters(keyword, status, pageable);
+
         return orders.map(OrderListResponse::new);
     }
 
