@@ -1,5 +1,7 @@
 package com.spartabugkiller.ecommercebackofficeproject.customer.entity;
 
 public enum CustomerStatus {
-    ACTIVE, BLACKLIST, WITHDRAWN, INACTIVE, DELETED
+    ACTIVE,    // 활성
+    INACTIVE,  // 비활성
+    SUSPENDED  // 정지
 }

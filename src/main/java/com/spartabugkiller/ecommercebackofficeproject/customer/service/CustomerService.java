@@ -19,60 +19,39 @@ public class CustomerService {
 
     @Transactional
     public CustomerResponse signup(CustomerRequest request) {
-        Customer customer = new Customer(request);
+        Customer customer = new Customer(request.getUsername(), request.getEmail(), request.getPhone());
         return new CustomerResponse(customerRepository.save(customer), 0L, 0L);
     }
 
-    // 검색/필터 없이 단순 조회용
-    @Transactional(readOnly = true)
-    public Page<CustomerResponse> getCustomers(Pageable pageable) {
-        return getCustomers("", CustomerStatus.ACTIVE, pageable);
-    }
-
-    // 검색 + 상태 필터용
     @Transactional(readOnly = true)
     public Page<CustomerResponse> getCustomers(String keyword, CustomerStatus status, Pageable pageable) {
-        return customerRepository.findByStatusAndUsernameContainingOrStatusAndEmailContaining(
-                        status, keyword, status, keyword, pageable)
-                .map(customer -> new CustomerResponse(customer, 0L, 0L));
+        return customerRepository.findAllWithOrderStats(keyword, status, pageable)
+                .map(obj -> new CustomerResponse((Customer) obj[0], (Long) obj[1], (Long) obj[2]));
     }
 
     @Transactional(readOnly = true)
-    public CustomerResponse getCustomer(Long customerId) {
-        Customer customer = findCustomer(customerId);
-        return new CustomerResponse(customer, 0L, 0L);
+    public CustomerResponse getCustomerDetail(Long id) {
+        Object[] result = customerRepository.findDetailWithOrderStats(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 고객입니다."));
+        return new CustomerResponse((Customer) result[0], (Long) result[1], (Long) result[2]);
     }
 
     @Transactional
-    public CustomerResponse updateCustomer(Long customerId, CustomerRequest request) {
-        Customer customer = findCustomer(customerId);
-        customer.update(request);
-        return new CustomerResponse(customer, 0L, 0L);
+    public void updateCustomer(Long id, CustomerRequest request) {
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("고객을 찾을 수 없습니다."));
+        customer.updateInfo(request.getUsername(), request.getEmail(), request.getPhone());
     }
 
     @Transactional
-    public CustomerResponse updateStatus(Long customerId, String statusStr) {
-        Customer customer = findCustomer(customerId);
-
-        CustomerStatus status;
-        try {
-            status = CustomerStatus.valueOf(statusStr.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("올바르지 않은 상태값입니다: " + statusStr);
-        }
-
+    public void updateStatus(Long id, CustomerStatus status) {
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("고객을 찾을 수 없습니다."));
         customer.updateStatus(status);
-        return new CustomerResponse(customer, 0L, 0L);
     }
 
     @Transactional
-    public void deleteCustomer(Long customerId) {
-        Customer customer = findCustomer(customerId);
-        customer.softDelete();
-    }
-
-    private Customer findCustomer(Long customerId) {
-        return customerRepository.findById(customerId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 고객이 존재하지 않습니다. ID: " + customerId));
+    public void deleteCustomer(Long id) {
+        customerRepository.deleteById(id);
     }
 }

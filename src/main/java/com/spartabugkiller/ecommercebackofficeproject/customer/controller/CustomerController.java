@@ -5,11 +5,11 @@ import com.spartabugkiller.ecommercebackofficeproject.customer.dto.response.Cust
 import com.spartabugkiller.ecommercebackofficeproject.customer.entity.CustomerStatus;
 import com.spartabugkiller.ecommercebackofficeproject.customer.service.CustomerService;
 import com.spartabugkiller.ecommercebackofficeproject.global.dto.ApiResponse;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,56 +19,45 @@ public class CustomerController {
 
     private final CustomerService customerService;
 
-    // 회원가입
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<CustomerResponse>> signup(@Valid @RequestBody CustomerRequest request) {
-        CustomerResponse response = customerService.signup(request);
-        return ResponseEntity.ok(ApiResponse.ok(response));
+    public ApiResponse<CustomerResponse> signup(@RequestBody CustomerRequest request) {
+        return ApiResponse.created(customerService.signup(request));
     }
 
-    // 고객 전체 조회 (검색/상태 필터 옵션)
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<CustomerResponse>>> getCustomers(
-            @RequestParam(required = false, defaultValue = "") String keyword,
+    public ApiResponse<Page<CustomerResponse>> getCustomers(
+            @RequestParam(required = false) String keyword,
             @RequestParam(required = false) CustomerStatus status,
-            Pageable pageable
-    ) {
-        CustomerStatus customerStatus = (status != null) ? status : CustomerStatus.ACTIVE;
-        Page<CustomerResponse> response = customerService.getCustomers(keyword, customerStatus, pageable);
-        return ResponseEntity.ok(ApiResponse.ok(response));
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction) {
+
+        Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        return ApiResponse.ok(customerService.getCustomers(keyword, status, pageable));
     }
 
-    // 단건 조회
-    @GetMapping("/{customerId}")
-    public ResponseEntity<ApiResponse<CustomerResponse>> getCustomer(@PathVariable Long customerId) {
-        CustomerResponse response = customerService.getCustomer(customerId);
-        return ResponseEntity.ok(ApiResponse.ok(response));
+    @GetMapping("/{id}")
+    public ApiResponse<CustomerResponse> getCustomer(@PathVariable Long id) {
+        return ApiResponse.ok(customerService.getCustomerDetail(id));
     }
 
-    // 고객 정보 수정
-    @PutMapping("/{customerId}")
-    public ResponseEntity<ApiResponse<CustomerResponse>> updateCustomer(
-            @PathVariable Long customerId,
-            @Valid @RequestBody CustomerRequest request
-    ) {
-        CustomerResponse response = customerService.updateCustomer(customerId, request);
-        return ResponseEntity.ok(ApiResponse.ok(response));
+    @PutMapping("/{id}")
+    public ApiResponse<String> updateCustomer(@PathVariable Long id, @RequestBody CustomerRequest request) {
+        customerService.updateCustomer(id, request);
+        return ApiResponse.ok("정보 수정이 완료되었습니다.");
     }
 
-    // 고객 상태 변경
-    @PatchMapping("/{customerId}/status")
-    public ResponseEntity<ApiResponse<CustomerResponse>> updateStatus(
-            @PathVariable Long customerId,
-            @RequestParam String status
-    ) {
-        CustomerResponse response = customerService.updateStatus(customerId, status);
-        return ResponseEntity.ok(ApiResponse.ok(response));
+    @PatchMapping("/{id}/status")
+    public ApiResponse<String> updateStatus(@PathVariable Long id, @RequestParam CustomerStatus status) {
+        customerService.updateStatus(id, status);
+        return ApiResponse.ok("상태 변경이 완료되었습니다.");
     }
 
-    // 논리 삭제
-    @DeleteMapping("/{customerId}")
-    public ResponseEntity<ApiResponse<Void>> deleteCustomer(@PathVariable Long customerId) {
-        customerService.deleteCustomer(customerId);
-        return ResponseEntity.ok(ApiResponse.noContent());
+    @DeleteMapping("/{id}")
+    public ApiResponse<String> deleteCustomer(@PathVariable Long id) {
+        customerService.deleteCustomer(id);
+        return ApiResponse.ok("고객 삭제가 완료되었습니다.");
     }
 }
