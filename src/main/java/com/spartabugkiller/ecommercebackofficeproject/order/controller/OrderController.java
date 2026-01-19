@@ -1,10 +1,10 @@
 package com.spartabugkiller.ecommercebackofficeproject.order.controller;
 
 import com.spartabugkiller.ecommercebackofficeproject.global.common.SessionUtils;
+import com.spartabugkiller.ecommercebackofficeproject.order.dto.request.OrderCancelRequest;
 import com.spartabugkiller.ecommercebackofficeproject.order.dto.request.OrderCreateRequest;
-import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.OrderCreateResponse;
-import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.OrderDetailResponse;
-import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.OrderListResponse;
+import com.spartabugkiller.ecommercebackofficeproject.order.dto.request.OrderStatusUpdateRequest;
+import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.*;
 import com.spartabugkiller.ecommercebackofficeproject.order.entity.OrderStatus;
 import com.spartabugkiller.ecommercebackofficeproject.order.service.OrderService;
 import jakarta.servlet.http.HttpSession;
@@ -44,8 +44,11 @@ public class OrderController {
      */
     @GetMapping("/orders/{id}")
     public ResponseEntity<OrderDetailResponse> getOrderDetail(
-            @PathVariable Long id
+            @PathVariable Long id,
+            HttpSession session
     ) {
+        SessionUtils.getLoginAdmin(session);
+
         return ResponseEntity.ok(orderService.getOrderDetail(id));
     }
 
@@ -65,4 +68,31 @@ public class OrderController {
         return ResponseEntity.ok(responses);
     }
 
+    /**
+     * 주문 상태 조회
+     */
+    @PatchMapping("orders/{id}/status")
+    public ResponseEntity<OrderStatusUpdateResponse> updateOrderStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody OrderStatusUpdateRequest request,
+            HttpSession session
+    ) {
+        SessionUtils.getLoginAdmin(session);
+
+        return ResponseEntity.ok(orderService.updateOrderStatus(id, request));
+    }
+
+    /**
+     * 주문 취소
+     */
+    @PostMapping("/orders/{orderId}/cancel")
+    public ResponseEntity<OrderCancelResponse> cancelOrder(
+            @PathVariable Long orderId,
+            @Valid @RequestBody OrderCancelRequest request,
+            HttpSession session
+    ) {
+
+        SessionUtils.getLoginAdmin(session);
+        return ResponseEntity.ok(orderService.cancelOrder(orderId, request));
+    }
 }
