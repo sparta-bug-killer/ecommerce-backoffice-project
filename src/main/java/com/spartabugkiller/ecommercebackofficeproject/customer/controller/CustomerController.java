@@ -4,6 +4,7 @@ import com.spartabugkiller.ecommercebackofficeproject.customer.dto.request.Custo
 import com.spartabugkiller.ecommercebackofficeproject.customer.dto.response.CustomerResponse;
 import com.spartabugkiller.ecommercebackofficeproject.customer.entity.CustomerStatus;
 import com.spartabugkiller.ecommercebackofficeproject.customer.service.CustomerService;
+import com.spartabugkiller.ecommercebackofficeproject.global.dto.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,74 +19,56 @@ public class CustomerController {
 
     private final CustomerService customerService;
 
-    /**
-     * 고객 생성
-     */
+    // 회원가입
     @PostMapping("/signup")
-    public ResponseEntity<CustomerResponse> signup(
-            @Valid @RequestBody CustomerRequest request
-    ) {
-        return ResponseEntity.ok(customerService.signup(request));
+    public ResponseEntity<ApiResponse<CustomerResponse>> signup(@Valid @RequestBody CustomerRequest request) {
+        CustomerResponse response = customerService.signup(request);
+        return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
-    /**
-     * 고객 리스트 조회
-     */
+    // 고객 전체 조회 (검색/상태 필터 옵션)
     @GetMapping
-    public ResponseEntity<Page<CustomerResponse>> getCustomers(
-            @RequestParam(required = false) String keyword,
+    public ResponseEntity<ApiResponse<Page<CustomerResponse>>> getCustomers(
+            @RequestParam(required = false, defaultValue = "") String keyword,
             @RequestParam(required = false) CustomerStatus status,
             Pageable pageable
     ) {
-        return ResponseEntity.ok(
-                customerService.getCustomers(keyword, status, pageable)
-        );
+        CustomerStatus customerStatus = (status != null) ? status : CustomerStatus.ACTIVE;
+        Page<CustomerResponse> response = customerService.getCustomers(keyword, customerStatus, pageable);
+        return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
-    /**
-     * 고객 상세 조회
-     */
+    // 단건 조회
     @GetMapping("/{customerId}")
-    public ResponseEntity<CustomerResponse> getCustomer(
-            @PathVariable Long customerId
-    ) {
-        return ResponseEntity.ok(customerService.getCustomer(customerId));
+    public ResponseEntity<ApiResponse<CustomerResponse>> getCustomer(@PathVariable Long customerId) {
+        CustomerResponse response = customerService.getCustomer(customerId);
+        return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
-    /**
-     * 고객 정보 수정
-     */
+    // 고객 정보 수정
     @PutMapping("/{customerId}")
-    public ResponseEntity<CustomerResponse> updateCustomer(
+    public ResponseEntity<ApiResponse<CustomerResponse>> updateCustomer(
             @PathVariable Long customerId,
             @Valid @RequestBody CustomerRequest request
     ) {
-        return ResponseEntity.ok(
-                customerService.updateCustomer(customerId, request)
-        );
+        CustomerResponse response = customerService.updateCustomer(customerId, request);
+        return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
-    /**
-     * 고객 상태 변경
-     */
+    // 고객 상태 변경
     @PatchMapping("/{customerId}/status")
-    public ResponseEntity<CustomerResponse> updateStatus(
+    public ResponseEntity<ApiResponse<CustomerResponse>> updateStatus(
             @PathVariable Long customerId,
-            @RequestParam CustomerStatus status
+            @RequestParam String status
     ) {
-        return ResponseEntity.ok(
-                customerService.updateStatus(customerId, status)
-        );
+        CustomerResponse response = customerService.updateStatus(customerId, status);
+        return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
-    /**
-     * 고객 삭제 (논리 삭제)
-     */
+    // 논리 삭제
     @DeleteMapping("/{customerId}")
-    public ResponseEntity<Void> deleteCustomer(
-            @PathVariable Long customerId
-    ) {
+    public ResponseEntity<ApiResponse<Void>> deleteCustomer(@PathVariable Long customerId) {
         customerService.deleteCustomer(customerId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponse.noContent());
     }
 }

@@ -25,7 +25,6 @@ public class Customer extends BaseEntity {
     @Column(nullable = false)
     private String phoneNumber;
 
-    // 🔽 String → enum 으로 변경 (핵심 수정)
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CustomerStatus status = CustomerStatus.ACTIVE;
@@ -36,20 +35,16 @@ public class Customer extends BaseEntity {
         this.phoneNumber = request.getPhoneNumber();
     }
 
-    // 고객 정보 수정 (요구사항 그대로)
     public void update(CustomerRequest request) {
         this.username = request.getUsername();
         this.email = request.getEmail();
-        this.phoneNumber = request.getPhoneNumber();
     }
 
-    // 상태 변경
     public void updateStatus(CustomerStatus status) {
         this.status = status;
     }
 
-    // 논리 삭제 → 탈퇴 상태
     public void softDelete() {
-        this.status = CustomerStatus.WITHDRAWN;
+        this.status = CustomerStatus.DELETED;
     }
 }

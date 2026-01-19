@@ -20,21 +20,20 @@ public class CustomerService {
     @Transactional
     public CustomerResponse signup(CustomerRequest request) {
         Customer customer = new Customer(request);
-        return new CustomerResponse(
-                customerRepository.save(customer),
-                0L,
-                0L
-        );
+        return new CustomerResponse(customerRepository.save(customer), 0L, 0L);
     }
 
+    // 검색/필터 없이 단순 조회용
     @Transactional(readOnly = true)
-    public Page<CustomerResponse> getCustomers(
-            String keyword,
-            CustomerStatus status,
-            Pageable pageable
-    ) {
-        return customerRepository
-                .searchCustomers(status, keyword, pageable)
+    public Page<CustomerResponse> getCustomers(Pageable pageable) {
+        return getCustomers("", CustomerStatus.ACTIVE, pageable);
+    }
+
+    // 검색 + 상태 필터용
+    @Transactional(readOnly = true)
+    public Page<CustomerResponse> getCustomers(String keyword, CustomerStatus status, Pageable pageable) {
+        return customerRepository.findByStatusAndUsernameContainingOrStatusAndEmailContaining(
+                        status, keyword, status, keyword, pageable)
                 .map(customer -> new CustomerResponse(customer, 0L, 0L));
     }
 
@@ -52,8 +51,16 @@ public class CustomerService {
     }
 
     @Transactional
-    public CustomerResponse updateStatus(Long customerId, CustomerStatus status) {
+    public CustomerResponse updateStatus(Long customerId, String statusStr) {
         Customer customer = findCustomer(customerId);
+
+        CustomerStatus status;
+        try {
+            status = CustomerStatus.valueOf(statusStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("올바르지 않은 상태값입니다: " + statusStr);
+        }
+
         customer.updateStatus(status);
         return new CustomerResponse(customer, 0L, 0L);
     }
@@ -66,8 +73,6 @@ public class CustomerService {
 
     private Customer findCustomer(Long customerId) {
         return customerRepository.findById(customerId)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("해당 고객이 존재하지 않습니다. ID: " + customerId)
-                );
+                .orElseThrow(() -> new IllegalArgumentException("해당 고객이 존재하지 않습니다. ID: " + customerId));
     }
 }
