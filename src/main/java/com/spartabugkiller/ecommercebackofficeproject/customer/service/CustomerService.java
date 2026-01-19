@@ -6,7 +6,6 @@ import com.spartabugkiller.ecommercebackofficeproject.customer.dto.response.GetC
 import com.spartabugkiller.ecommercebackofficeproject.customer.entity.Customer;
 import com.spartabugkiller.ecommercebackofficeproject.customer.entity.CustomerStatus;
 import com.spartabugkiller.ecommercebackofficeproject.customer.repository.CustomerRepository;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,20 +24,16 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
 
     @Transactional(readOnly = true)
-    public GetCustomersResponse getCustomers(HttpSession session, String keyword, CustomerStatus status, int page, int size, String sortBy, String order) {
-        // 1. 팀원들 방식대로 정렬 설정
+    public GetCustomersResponse getCustomers(String keyword, CustomerStatus status, int page, int size, String sortBy, String order) {
         Sort sort = order.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        // 2. 데이터 조회
         Page<Object[]> result = customerRepository.findAllWithOrderStats(keyword, status, pageable);
 
-        // 3. DTO 리스트로 변환
         List<CustomerResponse> customerResponses = result.getContent().stream()
                 .map(obj -> new CustomerResponse((Customer) obj[0], (Long) obj[1], (Long) obj[2]))
                 .collect(Collectors.toList());
 
-        // 4. 팀 규격 DTO(GetCustomersResponse)로 감싸서 반환
         return GetCustomersResponse.builder()
                 .customers(customerResponses)
                 .currentPage(result.getNumber() + 1)
@@ -49,28 +44,37 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
-    public CustomerResponse getCustomerDetail(Long id, HttpSession session) {
+    public CustomerResponse getCustomerDetail(Long id) {
+        // [반영] IllegalArgumentException 제거 -> RuntimeException 사용
         Object[] result = customerRepository.findDetailWithOrderStats(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 고객입니다."));
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 고객입니다. ID: " + id));
         return new CustomerResponse((Customer) result[0], (Long) result[1], (Long) result[2]);
     }
 
     @Transactional
-    public CustomerResponse updateCustomer(Long id, CustomerRequest request, HttpSession session) {
-        Customer customer = customerRepository.findById(id).orElseThrow();
+    public CustomerResponse updateCustomer(Long id, CustomerRequest request) {
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("수정할 고객을 찾을 수 없습니다."));
+
         customer.updateInfo(request.getUsername(), request.getEmail(), request.getPhone());
-        return new CustomerResponse(customer, 0L, 0L); // 수정 후 응답 객체 반환
+        return new CustomerResponse(customer, 0L, 0L);
     }
 
     @Transactional
-    public CustomerResponse updateStatus(Long id, CustomerStatus status, HttpSession session) {
-        Customer customer = customerRepository.findById(id).orElseThrow();
+    public CustomerResponse updateStatus(Long id, CustomerStatus status) {
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("상태를 변경할 고객을 찾을 수 없습니다."));
+
         customer.updateStatus(status);
         return new CustomerResponse(customer, 0L, 0L);
     }
 
     @Transactional
-    public void deleteCustomer(Long id, HttpSession session) {
+    public void deleteCustomer(Long id) {
+        // [반영] 존재 여부 확인 후 삭제 (IllegalArgumentException 방지)
+        if (!customerRepository.existsById(id)) {
+            throw new RuntimeException("삭제할 고객이 존재하지 않습니다.");
+        }
         customerRepository.deleteById(id);
     }
 }
