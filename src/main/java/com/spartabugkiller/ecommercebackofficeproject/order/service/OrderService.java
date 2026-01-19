@@ -34,6 +34,9 @@ public class OrderService {
     private final AdminRepository adminRepository;
     private final OrderNumberGenerator orderNumberGenerator;
 
+    /**
+     * 주문 등록
+     */
     @Transactional
     public OrderCreateResponse createOrder(OrderCreateRequest request, Long adminId) {
         Admin loginAdmin = adminRepository.findById(adminId)
@@ -69,6 +72,9 @@ public class OrderService {
         return new OrderCreateResponse(savedOrder);
     }
 
+    /**
+     * 단종,품절,재고부족 검증
+     */
     private void validationProductForOrder(Product product, int quantity) {
         // 단종 상태 확인
         if (product.getStatus() == ProductStatus.DISCONTINUED) {
@@ -125,6 +131,9 @@ public class OrderService {
         return OrderStatusUpdateResponse.from(order, beforeStatus);
     }
 
+    /**
+     * 주문 취소
+     */
     @Transactional
     public OrderCancelResponse cancelOrder(Long orderId, OrderCancelRequest request) {
 

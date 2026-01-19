@@ -19,7 +19,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                 AND(:keyword IS NULL OR o.orderNum LIKE %:keyword% OR c.username LIKE %:keyword%)
             """)
     Page<Order> findWithFilters (
-    @Param("keyword") String keword,
+    @Param("keyword") String keyword,
     @Param("status") OrderStatus status,
     Pageable pageable);
 }
