@@ -5,9 +5,9 @@ import com.spartabugkiller.ecommercebackofficeproject.customer.dto.response.Cust
 import com.spartabugkiller.ecommercebackofficeproject.customer.dto.response.GetCustomersResponse;
 import com.spartabugkiller.ecommercebackofficeproject.customer.entity.Customer;
 import com.spartabugkiller.ecommercebackofficeproject.customer.entity.CustomerStatus;
-import com.spartabugkiller.ecommercebackofficeproject.customer.exception.CustomerNotFoundException; // 커스텀 예외
+import com.spartabugkiller.ecommercebackofficeproject.customer.exception.CustomerNotFoundException;
 import com.spartabugkiller.ecommercebackofficeproject.customer.repository.CustomerRepository;
-import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode; // 에러코드 사용
+import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,7 +33,12 @@ public class CustomerService {
         Page<Object[]> result = customerRepository.findAllWithOrderStats(keyword, status, pageable);
 
         List<CustomerResponse> customerResponses = result.getContent().stream()
-                .map(obj -> new CustomerResponse((Customer) obj[0], (Long) obj[1], (Long) obj[2]))
+                .map(obj -> {
+                    Customer customer = (Customer) obj[0];
+                    Long count = (obj[1] != null) ? ((Number) obj[1]).longValue() : 0L;
+                    Long sum = (obj[2] != null) ? ((Number) obj[2]).longValue() : 0L;
+                    return new CustomerResponse(customer, count, sum);
+                })
                 .collect(Collectors.toList());
 
         return GetCustomersResponse.builder()
@@ -47,28 +52,31 @@ public class CustomerService {
 
     @Transactional(readOnly = true)
     public CustomerResponse getCustomerDetail(Long id) {
-        // 팀원 스타일: 전용 메서드 호출
-        Customer customer = findById(id);
-
-        // 상세 조회의 경우 조인 데이터가 필요하므로 기존 쿼리 결과에서 예외처리만 변경
-        Object[] result = customerRepository.findDetailWithOrderStats(id)
+        Object result = customerRepository.findDetailWithOrderStats(id)
                 .orElseThrow(() -> new CustomerNotFoundException(ErrorCode.CUSTOMER_NOT_FOUND));
 
-        return new CustomerResponse((Customer) result[0], (Long) result[1], (Long) result[2]);
+        Object[] row = (Object[]) result;
+        Customer customer = (Customer) row[0];
+        Long orderCount = (row[1] != null) ? ((Number) row[1]).longValue() : 0L;
+        Long totalAmount = (row[2] != null) ? ((Number) row[2]).longValue() : 0L;
+
+        return new CustomerResponse(customer, orderCount, totalAmount);
     }
 
     @Transactional
     public CustomerResponse updateCustomer(Long id, CustomerRequest request) {
         Customer customer = findById(id);
         customer.updateInfo(request.getUsername(), request.getEmail(), request.getPhone());
-        return new CustomerResponse(customer, 0L, 0L);
+        customerRepository.save(customer);
+        return getCustomerDetail(id);
     }
 
     @Transactional
     public CustomerResponse updateStatus(Long id, CustomerStatus status) {
         Customer customer = findById(id);
         customer.updateStatus(status);
-        return new CustomerResponse(customer, 0L, 0L);
+        customerRepository.save(customer);
+        return getCustomerDetail(id);
     }
 
     @Transactional
@@ -76,7 +84,6 @@ public class CustomerService {
         Customer customer = findById(id);
         customerRepository.delete(customer);
     }
-
 
     private Customer findById(Long id) {
         return customerRepository.findById(id).orElseThrow(
