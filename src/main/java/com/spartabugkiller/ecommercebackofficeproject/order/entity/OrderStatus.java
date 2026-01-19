@@ -1,7 +1,6 @@
 package com.spartabugkiller.ecommercebackofficeproject.order.entity;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
 public enum OrderStatus {

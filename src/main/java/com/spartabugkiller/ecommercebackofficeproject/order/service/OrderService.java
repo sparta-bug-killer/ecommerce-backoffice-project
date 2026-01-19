@@ -6,9 +6,10 @@ import com.spartabugkiller.ecommercebackofficeproject.admin.repository.AdminRepo
 import com.spartabugkiller.ecommercebackofficeproject.customer.entity.Customer;
 import com.spartabugkiller.ecommercebackofficeproject.customer.repository.CustomerRepository;
 import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
+import com.spartabugkiller.ecommercebackofficeproject.order.dto.request.OrderCancelRequest;
 import com.spartabugkiller.ecommercebackofficeproject.order.dto.request.OrderCreateRequest;
-import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.OrderCreateResponse;
-import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.OrderDetailResponse;
+import com.spartabugkiller.ecommercebackofficeproject.order.dto.request.OrderStatusUpdateRequest;
+import com.spartabugkiller.ecommercebackofficeproject.order.dto.response.*;
 import com.spartabugkiller.ecommercebackofficeproject.order.entity.Order;
 import com.spartabugkiller.ecommercebackofficeproject.order.entity.OrderStatus;
 import com.spartabugkiller.ecommercebackofficeproject.order.exception.*;
@@ -18,10 +19,10 @@ import com.spartabugkiller.ecommercebackofficeproject.product.entity.ProductStat
 import com.spartabugkiller.ecommercebackofficeproject.product.exception.ProductNotFoundException;
 import com.spartabugkiller.ecommercebackofficeproject.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +34,9 @@ public class OrderService {
     private final AdminRepository adminRepository;
     private final OrderNumberGenerator orderNumberGenerator;
 
+    /**
+     * 주문 등록
+     */
     @Transactional
     public OrderCreateResponse createOrder(OrderCreateRequest request, Long adminId) {
         Admin loginAdmin = adminRepository.findById(adminId)
@@ -68,6 +72,9 @@ public class OrderService {
         return new OrderCreateResponse(savedOrder);
     }
 
+    /**
+     * 단종,품절,재고부족 검증
+     */
     private void validationProductForOrder(Product product, int quantity) {
         // 단종 상태 확인
         if (product.getStatus() == ProductStatus.DISCONTINUED) {
@@ -90,9 +97,57 @@ public class OrderService {
         }
     }
 
+    /**
+     * 주문 상세 조회
+     */
     public OrderDetailResponse getOrderDetail(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(ErrorCode.ORDER_NOT_FOUND));
         return new OrderDetailResponse(order);
+    }
+
+    /**
+     * 주문 리스트 조회
+     */
+    @Transactional(readOnly = true)
+    public Page<OrderListResponse> getOrderList(String keyword, OrderStatus status, Pageable pageable) {
+        Page<Order> orders = orderRepository.findWithFilters(keyword, status, pageable);
+        return orders.map(OrderListResponse::new);
+    }
+
+    /**
+     * 주문 상태 변경
+     */
+    @Transactional
+    public OrderStatusUpdateResponse updateOrderStatus(Long orderId, OrderStatusUpdateRequest request) {
+        // 예외처리
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException(ErrorCode.ORDER_NOT_FOUND));
+        // 변경전 상태 저장
+        OrderStatus beforeStatus = order.getStatus();
+        // 상태 변경
+        order.changeStatus(request.getStatus());
+
+        return OrderStatusUpdateResponse.from(order, beforeStatus);
+    }
+
+    /**
+     * 주문 취소
+     */
+    @Transactional
+    public OrderCancelResponse cancelOrder(Long orderId, OrderCancelRequest request) {
+
+        // 예외처리
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException(ErrorCode.ORDER_NOT_FOUND));
+        OrderStatus beforeStatus = order.getStatus();
+
+        order.cancel(request.getCancelReason());
+
+        // 재고 복구
+        Product product = order.getProduct();
+        product.restoreStock(order.getQuantity());
+
+        return OrderCancelResponse.from(order, beforeStatus);
     }
 }

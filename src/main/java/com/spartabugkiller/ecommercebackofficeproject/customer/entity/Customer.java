@@ -1,16 +1,19 @@
 package com.spartabugkiller.ecommercebackofficeproject.customer.entity;
 
-import com.spartabugkiller.ecommercebackofficeproject.customer.dto.request.CustomerRequest;
-import com.spartabugkiller.ecommercebackofficeproject.global.common.BaseEntity; // BaseEntity 위치 확인 필요
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "customers")
 @Getter
 @NoArgsConstructor
-@Table(name = "customers")
-public class Customer extends BaseEntity { // 상속 적용
+@EntityListeners(AuditingEntityListener.class)
+public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,32 +22,33 @@ public class Customer extends BaseEntity { // 상속 적용
     @Column(nullable = false)
     private String username;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false)
-    private String phoneNumber;
+    @Column(name = "phone_number", nullable = false)
+    private String phone;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String status = "ACTIVE";
+    private CustomerStatus status = CustomerStatus.ACTIVE;
 
-    public Customer(CustomerRequest request) {
-        this.username = request.getUsername();
-        this.email = request.getEmail();
-        this.phoneNumber = request.getPhoneNumber();
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    public Customer(String username, String email, String phone) {
+        this.username = username;
+        this.email = email;
+        this.phone = phone;
     }
 
-    public void update(CustomerRequest request) {
-        this.username = request.getUsername();
-        this.email = request.getEmail();
+    public void updateInfo(String username, String email, String phone) {
+        this.username = username;
+        this.email = email;
+        this.phone = phone;
     }
 
-    public void updateStatus(String status) {
+    public void updateStatus(CustomerStatus status) {
         this.status = status;
-    }
-
-    // 논리 삭제: BaseEntity의 기능을 활용하거나 status 변경
-    public void softDelete() {
-        this.status = "DELETED";
     }
 }

@@ -22,16 +22,23 @@ public class AdminController {
 
     private final AdminService adminService;
 
-    // 관리자 회원가입 요청 API
+    /**
+     * 관리자 회원가입 API
+     */
     @PostMapping("/signup")
-    public ResponseEntity<SignupAdminResponse> signup(@Valid @RequestBody SignupAdminRequest request) {
+    public ResponseEntity<ApiResponse<SignupAdminResponse>> signup(
+            @Valid @RequestBody SignupAdminRequest request
+    ) {
         SignupAdminResponse response = adminService.signup(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.created(response));
     }
 
-    // 관리자 로그인 요청 API
+
+    /**
+     * 관리자 로그인 API
+     */
     @PostMapping("/signin")
-    public ResponseEntity<SigninAdminResponse> signin(
+    public ResponseEntity<ApiResponse<SigninAdminResponse>> signin(
             @Valid @RequestBody SigninAdminRequest request,
             HttpSession session
     ) {
@@ -40,14 +47,18 @@ public class AdminController {
         // 세션에 로그인 정보 저장
         session.setAttribute("LOGIN_ADMIN", SessionAdmin.from(admin));
 
-        return ResponseEntity.ok(SigninAdminResponse.from(admin));
+        return ResponseEntity.ok(ApiResponse.ok(SigninAdminResponse.from(admin)));
     }
 
-    // 관리자 로그아웃 요청 API
+    /**
+     * 관리자 로그아웃 API
+     */
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpSession session) {
+    public ResponseEntity<ApiResponse<Void>> logout(
+            HttpSession session
+    ) {
         adminService.logout(session);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ApiResponse.noContent());
     }
 
     /**
