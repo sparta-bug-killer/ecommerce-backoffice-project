@@ -1,6 +1,7 @@
 package com.spartabugkiller.ecommercebackofficeproject.order.controller;
 
 import com.spartabugkiller.ecommercebackofficeproject.global.common.SessionUtils;
+import com.spartabugkiller.ecommercebackofficeproject.global.dto.ApiResponse;
 import com.spartabugkiller.ecommercebackofficeproject.order.dto.request.OrderCancelRequest;
 import com.spartabugkiller.ecommercebackofficeproject.order.dto.request.OrderCreateRequest;
 import com.spartabugkiller.ecommercebackofficeproject.order.dto.request.OrderStatusUpdateRequest;
@@ -26,17 +27,18 @@ public class OrderController {
     private final OrderService orderService;
 
     /**
-     * 주문 생성
+     * CS 주문 생성
      */
     @PostMapping("/orders")
-    public ResponseEntity<OrderCreateResponse> createOrder(
+    public ResponseEntity<ApiResponse<OrderCreateResponse>> createOrder(
             @Valid @RequestBody OrderCreateRequest request,
             HttpSession session) {
 
         Long adminId = SessionUtils.getLoginAdmin(session).getId();
 
         OrderCreateResponse response = orderService.createOrder(request, adminId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.created(response));
     }
 
     /**
@@ -56,7 +58,7 @@ public class OrderController {
      * 주문 리스트 조회
      */
     @GetMapping("/orders")
-    public ResponseEntity<Page<OrderListResponse>> getOrderList(
+    public ResponseEntity<ApiResponse<Page<OrderListResponse>>> getOrderList(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) OrderStatus status,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
@@ -65,7 +67,7 @@ public class OrderController {
         SessionUtils.getLoginAdmin(session);
 
         Page<OrderListResponse> responses = orderService.getOrderList(keyword, status, pageable);
-        return ResponseEntity.ok(responses);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.ok(responses));
     }
 
     /**
