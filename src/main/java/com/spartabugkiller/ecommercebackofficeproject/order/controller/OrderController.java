@@ -45,13 +45,15 @@ public class OrderController {
      * 주문 상세 조회
      */
     @GetMapping("/orders/{id}")
-    public ResponseEntity<OrderDetailResponse> getOrderDetail(
+    public ResponseEntity<ApiResponse<OrderDetailResponse>> getOrderDetail(
             @PathVariable Long id,
             HttpSession session
     ) {
         SessionUtils.getLoginAdmin(session);
 
-        return ResponseEntity.ok(orderService.getOrderDetail(id));
+        return ResponseEntity.ok(
+                ApiResponse.ok(orderService.getOrderDetail(id))
+        );
     }
 
     /**
@@ -71,30 +73,34 @@ public class OrderController {
     }
 
     /**
-     * 주문 상태 조회
+     * 주문 상태 변경
      */
-    @PatchMapping("orders/{id}/status")
-    public ResponseEntity<OrderStatusUpdateResponse> updateOrderStatus(
+    @PatchMapping("/orders/{id}/status")
+    public ResponseEntity<ApiResponse<OrderStatusUpdateResponse>> updateOrderStatus(
             @PathVariable Long id,
             @Valid @RequestBody OrderStatusUpdateRequest request,
             HttpSession session
     ) {
         SessionUtils.getLoginAdmin(session);
 
-        return ResponseEntity.ok(orderService.updateOrderStatus(id, request));
+        return ResponseEntity.ok(
+                ApiResponse.ok(orderService.updateOrderStatus(id, request))
+        );
     }
 
     /**
      * 주문 취소
      */
     @PostMapping("/orders/{orderId}/cancel")
-    public ResponseEntity<OrderCancelResponse> cancelOrder(
+    public ResponseEntity<ApiResponse<OrderCancelResponse>> cancelOrder(
             @PathVariable Long orderId,
             @Valid @RequestBody OrderCancelRequest request,
             HttpSession session
     ) {
-
         SessionUtils.getLoginAdmin(session);
-        return ResponseEntity.ok(orderService.cancelOrder(orderId, request));
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(orderService.cancelOrder(orderId, request))
+        );
     }
 }
