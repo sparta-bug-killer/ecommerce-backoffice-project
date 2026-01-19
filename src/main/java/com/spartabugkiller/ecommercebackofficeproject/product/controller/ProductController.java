@@ -34,7 +34,7 @@ public class ProductController {
      *  상품 등록
      */
     @PostMapping("/products")
-    public ResponseEntity<ProductCreateResponse> createProduct(
+    public ResponseEntity<ApiResponse<ProductCreateResponse>> createProduct(
             @Valid @RequestBody ProductCreateRequest request,
             HttpSession session) {
 
@@ -42,14 +42,14 @@ public class ProductController {
         Long adminId = SessionUtils.getLoginAdmin(session).getId();
 
         ProductCreateResponse response = productService.createProduct(request, adminId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.created(response));
     }
 
     /**
      *  상품 상세 조회
      */
     @GetMapping("/products/{id}")
-    public ResponseEntity<GetProductResponse> getProduct(
+    public ResponseEntity<ApiResponse<GetProductResponse>> getProduct(
             @PathVariable Long id,
             HttpSession session) {
 
@@ -57,14 +57,14 @@ public class ProductController {
         SessionUtils.getLoginAdmin(session);
 
         GetProductResponse response = productService.getProduct(id);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.ok(response));
     }
 
     /**
      *  상품 정보 수정
      */
     @PatchMapping("/products/{id}")
-    public ResponseEntity<GetProductResponse> updateProduct(
+    public ResponseEntity<ApiResponse<GetProductResponse>> updateProduct(
             @PathVariable Long id,
             @Valid @RequestBody ProductUpdateRequest request,
             HttpSession session) {
@@ -73,7 +73,7 @@ public class ProductController {
         SessionUtils.getLoginAdmin(session);
 
         GetProductResponse response = productService.updateProduct(id, request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.ok(response));
     }
 
     /**
