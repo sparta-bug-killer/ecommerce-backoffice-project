@@ -77,7 +77,7 @@ public class CustomerService {
         customerRepository.delete(customer);
     }
 
-    // ★ 팀원 코드(AdminService)에서 가장 중요한 부분: 공통 조회 메서드
+
     private Customer findById(Long id) {
         return customerRepository.findById(id).orElseThrow(
                 () -> new CustomerNotFoundException(ErrorCode.CUSTOMER_NOT_FOUND)
