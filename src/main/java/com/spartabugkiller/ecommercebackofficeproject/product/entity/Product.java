@@ -1,0 +1,126 @@
+package com.spartabugkiller.ecommercebackofficeproject.product.entity;
+
+import com.spartabugkiller.ecommercebackofficeproject.admin.entity.Admin;
+import com.spartabugkiller.ecommercebackofficeproject.global.common.BaseEntity;
+import com.spartabugkiller.ecommercebackofficeproject.global.exception.ErrorCode;
+import com.spartabugkiller.ecommercebackofficeproject.product.exception.ProductInvalidCategoryException;
+import com.spartabugkiller.ecommercebackofficeproject.product.exception.ProductInvalidNameException;
+import com.spartabugkiller.ecommercebackofficeproject.product.exception.ProductInvalidPriceException;
+import com.spartabugkiller.ecommercebackofficeproject.product.exception.ProductDiscontinuedException;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@Entity
+@Table(name = "products")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Product extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
+    private int price;
+
+    @Column(nullable = false)
+    private int stock;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ProductStatus status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "admin_id", nullable = false)
+    private Admin admin;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private ProductCategory category;
+
+    @Builder
+    public Product(String name, int price, int stock, ProductStatus status, Admin admin, ProductCategory category) {
+        if (name == null || name.isBlank()) throw new ProductInvalidNameException(ErrorCode.INVALID_PRODUCT_NAME);
+        if (price < 0) throw new ProductInvalidPriceException(ErrorCode.INVALID_PRODUCT_PRICE);
+
+        this.name = name;
+        this.price = price;
+        this.stock = stock;
+        this.admin = admin;
+        this.category = category;
+        this.status = ProductStatus.ON_SALE;
+    }
+
+    public void changeName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new ProductInvalidNameException(ErrorCode.INVALID_PRODUCT_NAME);
+        }
+        this.name = name;
+    }
+
+    public void changePrice(int price) {
+        if (price < 0) {
+            throw new ProductInvalidPriceException(ErrorCode.INVALID_PRODUCT_PRICE);
+        }
+        this.price = price;
+    }
+
+    public void changeCategory(ProductCategory category) {
+        if (category == null) {
+            throw new ProductInvalidCategoryException(ErrorCode.INVALID_PRODUCT_CATEGORY);
+        }
+        this.category = category;
+    }
+
+    // 재고 변경
+    public void updateStock(int stock) {
+
+        // 상태가 단종일때는 재고 변경 X
+        if(this.status == ProductStatus.DISCONTINUED) {
+            throw new ProductDiscontinuedException(ErrorCode.PRODUCT_DISCONTINUED);
+        }
+
+        this.stock = stock;
+
+        // 재고 기준으로 상태 변경
+        if(stock <= 0) {
+            this.status = ProductStatus.OUT_OF_STOCK;
+        } else {
+            this.status = ProductStatus.ON_SALE;
+        }
+    }
+
+    // 상품 상태 변경(단종은 변경 불가)
+    public void updateStatus(ProductStatus newStatus) {
+
+        // 단종이면 상태 변경 불가
+        if (this.status == ProductStatus.DISCONTINUED) {
+            throw new ProductDiscontinuedException(ErrorCode.PRODUCT_DISCONTINUED);
+        }
+
+        // 판매중,품절 변경
+        this.status = newStatus;
+    }
+
+    // 주문 취소 시 재고 복구
+    public void restoreStock(int quantity) {
+
+        // 재고 복구
+        this.stock += quantity;
+
+        // 단종 상품이면 상태 변경 X
+        if (this.status == ProductStatus.DISCONTINUED) {
+            return;
+        }
+        // 재고가 0보다 커지면 판매중으로 전환
+        if (this.stock > 0) {
+            this.status = ProductStatus.ON_SALE;
+        }
+    }
+}
