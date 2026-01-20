@@ -25,5 +25,5 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
             "FROM Customer c LEFT JOIN Order o ON o.customer = c " +
             "WHERE c.id = :id " +
             "GROUP BY c")
-    Optional<Object[]> findDetailWithOrderStats(@Param("id") Long id);
+    Optional<Object> findDetailWithOrderStats(@Param("id") Long id);
 }
